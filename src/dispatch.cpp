@@ -61,13 +61,6 @@ Dispatch::Dispatch()
 
     mCamLive = {true, true, false, false};
 
-//    condition_variable vCon_not_full_0, vCon_not_full_1, vCon_not_full_2, vCon_not_full_3;
-//    condition_variable vCon_not_empty_0, vCon_not_empty_1, vCon_not_empty_2, vCon_not_empty_3;
-//    condition_variable vCon_rtmp_0, vCon_rtmp_1, vCon_rtmp_2, vCon_rtmp_3;
-//    mutex vConMutexCam_0, vConMutexCam_1, vConMutexCam_2, vConMutexCam_3;
-//    mutex vConMutexRTMP_0, vConMutexRTMP_1, vConMutexRTMP_2, vConMutexRTMP_3;
-//    mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
-
     mCon_not_full = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
     mCon_not_empty = { &vCon_not_empty_0, &vCon_not_empty_1, &vCon_not_empty_2, &vCon_not_empty_3};
     mCon_rtmp = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
@@ -85,22 +78,6 @@ Dispatch::Dispatch()
 //        cout << i << " : " << mRtmpMutex[i] << endl;
 //    }
 
-//    for (int i = 0; i < 4; ++i) {
-//        condition_variable vCon_not_full;
-//        cout << mCon_not_full[i] << endl;
-//        condition_variable vCon_not_empty;
-//        condition_variable vCon_rtmp;
-//        mutex vConMutexCam;
-//        mutex vConMutexRTMP;
-//        mutex vRtmpMutex;
-//
-//        mCon_not_full.emplace_back(&vCon_not_full);
-//        mCon_not_empty.emplace_back(&vCon_not_empty);
-//        mCon_rtmp.emplace_back(&vCon_rtmp);
-//        mConMutexCam.emplace_back(&vConMutexCam);
-//        mConMutexRTMP.emplace_back(&vConMutexRTMP);
-//        mRtmpMutex.emplace_back(&vRtmpMutex);
-//    }
     mRtmpImg.resize(4);
 
     mCamPath[0] = path_0;
@@ -207,12 +184,6 @@ void Dispatch::ConsumeRTMPImage(int mode){
 }
 
 void Dispatch::ProduceImage(int mode){
-
-//    string path_0 = labels["video_path_0"];
-//    string path_1 = labels["video_path_1"];
-
-////    string path_0 = "/home/user/Program/ls-dev/dispatchProject/UnitTest/test_video/fish_0.mp4";
-//    cout << "path_0 " << path_0 << endl;
 
     cv::VideoCapture cam;
     cv::Mat frame;
@@ -336,31 +307,6 @@ void Dispatch::ConsumeImage(int mode){
     cout << con_rtmp << endl;
     cout << "ConsumeImage  end " << endl;
 
-//    switch (mode){
-//        case 0:
-//            lock = &myMutex_front;
-//            queue = &mQueue_front;
-//            rtmpQueue = &mQueue_rtmp_front;
-//            con_v_wait = &con_front_not_empty;
-//            con_v_notification = &con_front_not_full;
-//            con_rtmp = &con_rtmp_front;
-//            rtmp_img = &rtmp_front_img;
-//            break;
-//        case 1:
-//            lock = &myMutex_mid;
-//            queue = &mQueue_mid;
-//            rtmpQueue = &mQueue_rtmp_mid;
-//            con_v_wait = &con_mid_not_empty;
-//            con_v_notification = &con_mid_not_full;
-//            con_rtmp = &con_rtmp_mid;
-//            rtmp_img = &rtmp_mid_img;
-//            break;
-//        case 2:
-//            break;
-//        default:
-//            break;
-//    }
-
 
     while (mCamLive[mode]){
         std::unique_lock<std::mutex> guard(*lock);
@@ -403,27 +349,6 @@ void Dispatch::ConsumeImage(int mode){
 }
 
 void Dispatch::multithreadTest(){
-//    thread thread_write_image_front(&Dispatch::ProduceImage, this, 0);
-//    thread thread_write_image_mid(&Dispatch::ProduceImage, this, 1);
-
-//    thread thread_read_image_front(&Dispatch::ConsumeImage, this, 0);
-//    thread thread_read_image_mid(&Dispatch::ConsumeImage, this, 1);
-
-//    thread thread_RTMP_front(&Dispatch::ConsumeRTMPImage, this, 0);
-//    thread thread_RTMP_mid(&Dispatch::ConsumeRTMPImage, this, 1);
-
-//    thread thread_RPC_server(&Dispatch::RPCServer, this);
-
-//    thread_write_image_front.join();
-//    thread_write_image_mid.join();
-
-//    thread_read_image_front.join();
-//    thread_read_image_mid.join();
-
-//    thread_RTMP_front.join();
-//    thread_RTMP_mid.join();
-
-//    thread_RPC_server.join();
 
     vector<thread> threadArr;
     for (int i = 0; i < mCamLive.size(); ++i) {
@@ -438,7 +363,5 @@ void Dispatch::multithreadTest(){
     for (auto& t : threadArr) {
         t.join();
     }
-
-
 
 }
