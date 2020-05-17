@@ -1,0 +1,10 @@
+#PET_ROOT: '/home/wangzhihui/Pet-dev-m'
+MODULES:
+  OBJDET:
+    GPU_ID: 0
+    CFG: '/home/user/workspace/xxs/Pet-engine/ckpts/rcnn/mscoco_humanparts/fcos/backbone/vovnet/fcos-imprv_V-39-FPN-P5_1x/fcos-imprv_V-39-FPN-P5_1x.yaml'
+#    CFG: '/home/user/workspace/xxs/Pet-engine/ckpts/fcos-imprv_V-19-E-FPN-P5_1x/fcos-imprv_V-19-E-FPN-P5_1x.yaml'
+    TEST_SCALE: 960
+    TEST_MAX_SIZE: 1920
+VIS:
+  VIS_TH: 0.6
