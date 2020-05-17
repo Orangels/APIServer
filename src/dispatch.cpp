@@ -36,13 +36,76 @@ int64_t getCurrentTime()
 
 Dispatch::Dispatch()
 {
-
+    cout << "start Init Dispatch" << endl;
     mQueueLen = stoi(labels["QLEN"]);
     frames_skip = stoi(labels["FRAMES_SKIP"]); //2
     rtmp_mode = stoi(labels["RTMP_MODE"]); //0
     int fps = stoi(labels["FPS"]);  //20
     int out_w = stoi(labels["OUT_W"]);  //2880
     int out_h = stoi(labels["OUT_H"]);  //960
+
+    string path_0 = labels["video_path_0"];
+    string path_1 = labels["video_path_1"];
+
+    mCamLive.resize(4);
+    mCamPath.resize(4);
+    mQueueCam.resize(4);
+    mQueue_rtmp.resize(4);
+
+    mCon_not_full.resize(4);
+    mCon_not_empty.resize(4);
+    mCon_rtmp.resize(4);
+    mConMutexCam.resize(4);
+    mConMutexRTMP.resize(4);
+    mRtmpMutex.resize(4);
+
+    mCamLive = {true, true, false, false};
+
+//    condition_variable vCon_not_full_0, vCon_not_full_1, vCon_not_full_2, vCon_not_full_3;
+//    condition_variable vCon_not_empty_0, vCon_not_empty_1, vCon_not_empty_2, vCon_not_empty_3;
+//    condition_variable vCon_rtmp_0, vCon_rtmp_1, vCon_rtmp_2, vCon_rtmp_3;
+//    mutex vConMutexCam_0, vConMutexCam_1, vConMutexCam_2, vConMutexCam_3;
+//    mutex vConMutexRTMP_0, vConMutexRTMP_1, vConMutexRTMP_2, vConMutexRTMP_3;
+//    mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
+
+    mCon_not_full = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
+    mCon_not_empty = { &vCon_not_empty_0, &vCon_not_empty_1, &vCon_not_empty_2, &vCon_not_empty_3};
+    mCon_rtmp = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
+    mConMutexCam = {&vConMutexCam_0, &vConMutexCam_1, &vConMutexCam_2, &vConMutexCam_3};
+    mConMutexRTMP = {&vConMutexRTMP_0, &vConMutexRTMP_1, &vConMutexRTMP_2, &vConMutexRTMP_3};
+    mRtmpMutex = {&vRtmpMutex_0, &vRtmpMutex_1, &vRtmpMutex_2, &vRtmpMutex_3};
+
+
+//    for (int i = 0; i < 4; ++i) {
+//        cout << i << " : " << mCon_not_full[i] << endl;
+//        cout << i << " : " << mCon_not_empty[i] << endl;
+//        cout << i << " : " << mCon_rtmp[i] << endl;
+//        cout << i << " : " << mConMutexCam[i] << endl;
+//        cout << i << " : " << mConMutexRTMP[i] << endl;
+//        cout << i << " : " << mRtmpMutex[i] << endl;
+//    }
+
+//    for (int i = 0; i < 4; ++i) {
+//        condition_variable vCon_not_full;
+//        cout << mCon_not_full[i] << endl;
+//        condition_variable vCon_not_empty;
+//        condition_variable vCon_rtmp;
+//        mutex vConMutexCam;
+//        mutex vConMutexRTMP;
+//        mutex vRtmpMutex;
+//
+//        mCon_not_full.emplace_back(&vCon_not_full);
+//        mCon_not_empty.emplace_back(&vCon_not_empty);
+//        mCon_rtmp.emplace_back(&vCon_rtmp);
+//        mConMutexCam.emplace_back(&vConMutexCam);
+//        mConMutexRTMP.emplace_back(&vConMutexRTMP);
+//        mRtmpMutex.emplace_back(&vRtmpMutex);
+//    }
+    mRtmpImg.resize(4);
+
+    mCamPath[0] = path_0;
+    mCamPath[1] = path_1;
+
 
     if (rtmp_mode){
         std::string rtmpPath_0 = labels["RTMP_PATH_0"]; //  rtmp://127.0.0.1:1935/hls/room
@@ -84,6 +147,7 @@ Dispatch::Dispatch()
 //
 //        matcher = new Match_ID(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["IMAGE_W"]), stoi(labels["IMAGE_H"]), stoi(labels["DIS"]));
 //    }
+    cout << "end Init Dispatch" << endl;
 
 }
 Dispatch::~Dispatch() = default;
@@ -111,29 +175,20 @@ void Dispatch::ConsumeRTMPImage(int mode){
     condition_variable *con_v_wait;
     mutex* rtmpLock;
 
-    switch (mode) {
-        case 0:
-            lock = &myMutex_rtmp_front;
-            queue = &mQueue_rtmp_front;
-            con_v_wait = &con_rtmp_front;
-            rtmpLock = &rtmpMutex_front;
-//            rtmpHandler = &ls_handler_front;
-            break;
-        case 1:
-            lock = &myMutex_rtmp_mid;
-            queue = &mQueue_rtmp_mid;
-            con_v_wait = &con_rtmp_mid;
-            rtmpLock = &rtmpMutex_mid;
-//            rtmpHandler = &ls_handler_mid;
-            break;
-        case 2:
-            break;
-        default:
-            break;
-    }
+    lock = mConMutexRTMP[mode];
+    queue = &mQueue_rtmp[mode];
+    con_v_wait = mCon_rtmp[mode];
+    rtmpLock = mRtmpMutex[mode];
+
+    cout << "ConsumeRTMPImage  start " << endl;
+    cout << lock << endl;
+    cout << con_v_wait << endl;
+    cout << rtmpLock << endl;
+    cout << "ConsumeRTMPImage  end " << endl;
 
 
-    while (true) {
+
+    while (mCamLive[mode]) {
         std::unique_lock<std::mutex> guard(*lock);
         while(queue->empty()) {
 //            std::cout << "Consumer RTMP " << mode << " -- " << num <<" is waiting for items...\n";
@@ -153,14 +208,15 @@ void Dispatch::ConsumeRTMPImage(int mode){
 
 void Dispatch::ProduceImage(int mode){
 
-    string path_0 = labels["video_path_0"];
-    string path_1 = labels["video_path_1"];
-    string fish_dat = labels["FISH_DAT"];
-//    string path_0 = "/home/user/Program/ls-dev/dispatchProject/UnitTest/test_video/fish_0.mp4";
-    cout << "path_0 " << path_0 << endl;
+//    string path_0 = labels["video_path_0"];
+//    string path_1 = labels["video_path_1"];
+
+////    string path_0 = "/home/user/Program/ls-dev/dispatchProject/UnitTest/test_video/fish_0.mp4";
+//    cout << "path_0 " << path_0 << endl;
 
     cv::VideoCapture cam;
-    cv::Mat frame = cv::imread(fish_dat);
+    cv::Mat frame;
+
     string path = "";
     mutex *lock;
     mutex *rtmpLock;
@@ -169,32 +225,23 @@ void Dispatch::ProduceImage(int mode){
 //    rtmpHandler* rtmpHandler;
     cv::Mat *rtmp_img;
 
-    switch (mode){
-        case 0:
-            path = path_0;
-            lock = &myMutex_front;
-            queue = &mQueue_front;
-            con_v_wait = &con_front_not_full;
-            con_v_notification = &con_front_not_empty;
+
+    path = mCamPath[mode];
+    lock = mConMutexCam[mode];
+//    lock = &myMutex_front;
+    queue = &mQueueCam[mode];
+    con_v_wait = mCon_not_full[mode];
+    con_v_notification = mCon_not_empty[mode];
 //            rtmpHandler = &ls_handler_front;
-            rtmpLock = &rtmpMutex_front;
-            rtmp_img = &rtmp_front_img;
-            break;
-        case 1:
-            path = path_1;
-            lock = &myMutex_mid;
-            queue = &mQueue_mid;
-            con_v_wait = &con_mid_not_full;
-            con_v_notification = &con_mid_not_empty;
-//            rtmpHandler = &ls_handler_mid;
-            rtmpLock = &rtmpMutex_mid;
-            rtmp_img = &rtmp_mid_img;
-            break;
-        case 2:
-            break;
-        default:
-            break;
-    }
+    rtmpLock = mRtmpMutex[mode];
+    rtmp_img = &mRtmpImg[mode];
+
+    cout << "ProduceImage  start " << endl;
+    cout << lock << endl;
+    cout << con_v_wait << endl;
+    cout << con_v_notification << endl;
+    cout << rtmpLock << endl;
+    cout << "ProduceImage  end " << endl;
 
     cam.open(path);
     cout << "mode "<< mode << " open camera suc "<< getCurrentTime() << endl;
@@ -217,14 +264,15 @@ void Dispatch::ProduceImage(int mode){
     int sum = 0;
     int num = 0;
     int64_t end = getCurrentTime();
-    for (int i=0; ; i++) {
 
+    int circle_i = 0;
+    while (mCamLive[mode]) {
+        circle_i ++;
         cam.read(frame);
-
-//        cout << "ProduceImage "<< mode << " img "<< i << " cost : " << getCurrentTime()-end << endl;
+//        cout << "ProduceImage "<< mode << " img "<< circle_i << " cost : " << getCurrentTime()-end << endl;
         end = getCurrentTime();
 
-        if (i % frames_skip != 0 ){
+        if (circle_i % frames_skip != 0 ){
             if (rtmp_mode == 1){
                 rtmpLock->lock();
 //                rtmpHandler->pushRTMP(*rtmp_img);
@@ -272,33 +320,49 @@ void Dispatch::ConsumeImage(int mode){
     cv::Mat* rtmp_img;
     cv::Mat ret_img;
 
-    switch (mode){
-        case 0:
-            lock = &myMutex_front;
-            queue = &mQueue_front;
-            rtmpQueue = &mQueue_rtmp_front;
-            con_v_wait = &con_front_not_empty;
-            con_v_notification = &con_front_not_full;
-            con_rtmp = &con_rtmp_front;
-            rtmp_img = &rtmp_front_img;
-            break;
-        case 1:
-            lock = &myMutex_mid;
-            queue = &mQueue_mid;
-            rtmpQueue = &mQueue_rtmp_mid;
-            con_v_wait = &con_mid_not_empty;
-            con_v_notification = &con_mid_not_full;
-            con_rtmp = &con_rtmp_mid;
-            rtmp_img = &rtmp_mid_img;
-            break;
-        case 2:
-            break;
-        default:
-            break;
-    }
+    lock = mConMutexCam[mode];
+//    lock = &myMutex_front;
+    queue = &mQueueCam[mode];
+    con_v_wait = mCon_not_empty[mode];
+    con_v_notification = mCon_not_full[mode];
+//            rtmpHandler = &ls_handler_front;
+    con_rtmp = mCon_rtmp[mode];
+    rtmp_img = &mRtmpImg[mode];
+
+    cout << "ConsumeImage  start " << endl;
+    cout << lock << endl;
+    cout << con_v_wait << endl;
+    cout << con_v_notification << endl;
+    cout << con_rtmp << endl;
+    cout << "ConsumeImage  end " << endl;
+
+//    switch (mode){
+//        case 0:
+//            lock = &myMutex_front;
+//            queue = &mQueue_front;
+//            rtmpQueue = &mQueue_rtmp_front;
+//            con_v_wait = &con_front_not_empty;
+//            con_v_notification = &con_front_not_full;
+//            con_rtmp = &con_rtmp_front;
+//            rtmp_img = &rtmp_front_img;
+//            break;
+//        case 1:
+//            lock = &myMutex_mid;
+//            queue = &mQueue_mid;
+//            rtmpQueue = &mQueue_rtmp_mid;
+//            con_v_wait = &con_mid_not_empty;
+//            con_v_notification = &con_mid_not_full;
+//            con_rtmp = &con_rtmp_mid;
+//            rtmp_img = &rtmp_mid_img;
+//            break;
+//        case 2:
+//            break;
+//        default:
+//            break;
+//    }
 
 
-    while (true){
+    while (mCamLive[mode]){
         std::unique_lock<std::mutex> guard(*lock);
         while(queue->empty()) {
 //            std::cout << "Consumer " << mode <<" is waiting for items...\n";
@@ -313,6 +377,13 @@ void Dispatch::ConsumeImage(int mode){
 
         //        TODO 业务逻辑
         ret_img = frame.clone();
+
+        if (stoi(labels["SAVE_IAMGE"]))
+        {
+            string img_path, img_path_center, img_path_ori;
+            img_path = "./imgs/" + to_string(num+10000) + "_" + to_string(mode) + ".jpg";
+            cv::imwrite(img_path, frame);
+        }
 
         if (rtmp_mode == 1) {
             // 推流
@@ -332,27 +403,42 @@ void Dispatch::ConsumeImage(int mode){
 }
 
 void Dispatch::multithreadTest(){
-    thread thread_write_image_front(&Dispatch::ProduceImage, this, 0);
-    thread thread_write_image_mid(&Dispatch::ProduceImage, this, 1);
+//    thread thread_write_image_front(&Dispatch::ProduceImage, this, 0);
+//    thread thread_write_image_mid(&Dispatch::ProduceImage, this, 1);
 
-    thread thread_read_image_front(&Dispatch::ConsumeImage, this, 0);
-    thread thread_read_image_mid(&Dispatch::ConsumeImage, this, 1);
+//    thread thread_read_image_front(&Dispatch::ConsumeImage, this, 0);
+//    thread thread_read_image_mid(&Dispatch::ConsumeImage, this, 1);
 
-    thread thread_RTMP_front(&Dispatch::ConsumeRTMPImage, this, 0);
-    thread thread_RTMP_mid(&Dispatch::ConsumeRTMPImage, this, 1);
+//    thread thread_RTMP_front(&Dispatch::ConsumeRTMPImage, this, 0);
+//    thread thread_RTMP_mid(&Dispatch::ConsumeRTMPImage, this, 1);
 
-    thread thread_RPC_server(&Dispatch::RPCServer, this);
+//    thread thread_RPC_server(&Dispatch::RPCServer, this);
 
-    thread_write_image_front.join();
-    thread_write_image_mid.join();
+//    thread_write_image_front.join();
+//    thread_write_image_mid.join();
 
-    thread_read_image_front.join();
-    thread_read_image_mid.join();
+//    thread_read_image_front.join();
+//    thread_read_image_mid.join();
 
-    thread_RTMP_front.join();
-    thread_RTMP_mid.join();
+//    thread_RTMP_front.join();
+//    thread_RTMP_mid.join();
 
-    thread_RPC_server.join();
+//    thread_RPC_server.join();
+
+    vector<thread> threadArr;
+    for (int i = 0; i < mCamLive.size(); ++i) {
+        if (mCamLive[i]){
+
+            threadArr.emplace_back(&Dispatch::ProduceImage, this, i);
+            threadArr.emplace_back(&Dispatch::ConsumeImage, this, i);
+            threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, i);
+        }
+    }
+
+    for (auto& t : threadArr) {
+        t.join();
+    }
+
 
 
 }
