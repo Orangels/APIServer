@@ -1,0 +1,18 @@
+//modelPrefix  /home/wwtx2/ssd4cls/ssd_VGG16_512x512-FL_1xMeanVariance
+//modelPrefix /home1/VisionProjectModel/caffe/headFace360_640MeanVariance
+//modelPrefix ../model/ssd_PELEE-LITE-THIN-BN-96HEAD-PROB02-FL_540x960_s2x_SCRATCHMeanVariance
+//modelPrefix ../model/r50seMeanVariance
+ageGender_modelPrefix /srv/models/nameAgeGenderMeanVariance
+ssd_detection_modelPrefix /srv/models/SSD_HF_360x640
+point_modelPrefix /srv/models/face3dMeanVariance
+//modelPrefix ../model/nameAgeGenderFace.onnx  /home/dbs/nameAgeGenderFaceblur.onnx   retina-0000.onnx
+
+iter 1
+gpuIndex 0
+numThread 1
+imageFileName  /home/nvidia/Program/api_server/tensorrtFrmame-master/4faces.jpg ../face.jpg 9people.jpg
+numLayer 1100
+batchSize 1
+functionName testNameAgeGender testSSD test3DkeyPoints testSSD testNameAgeGender testSSD testNameAgeGender testSSD testVertify  retinaFace  testVertify testNameAgeGender
+mean 103.52,116.28,123.675
+varience 57.375,57.12,58.395

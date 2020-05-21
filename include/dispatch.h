@@ -18,6 +18,8 @@
 #include "utils/match_id.h"
 #include <Python.h>
 
+#include "detection.h"
+
 using namespace std;
 class Dispatch
 {
@@ -34,7 +36,8 @@ class Dispatch
         int mQueueLen = 5;
 
 //      total cam params
-        vector<string> mCamPath;
+        vector<string> mCamPath; // 拉流地址
+        vector<cv::VideoWriter> mRTMPWriter; // 推流地址
         vector<bool> mCamLive;
 
         vector<queue<cv::Mat>> mQueueCam;
@@ -48,6 +51,8 @@ class Dispatch
         vector<mutex*> mRtmpMutex;
 
         vector<cv::Mat> mRtmpImg;
+
+//        vector<SSD_Detection> mSSD_Detections;
 
 
 //        front cam params
@@ -110,7 +115,8 @@ private:
     mutex vConMutexCam_0, vConMutexCam_1, vConMutexCam_2, vConMutexCam_3;
     mutex vConMutexRTMP_0, vConMutexRTMP_1, vConMutexRTMP_2, vConMutexRTMP_3;
     mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
-
+    cv::VideoWriter writer_0, writer_1, writer_2, writer_3;
+//    SSD_Detection ssd_detection_0, ssd_detection_1;
 //        Engine_api * pyEngineAPI;
 //
 //        Engine_api * pyEngineAPI_0;

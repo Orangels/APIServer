@@ -292,23 +292,23 @@ private:
 	std::condition_variable m_condition;
 };
 
-template<typename T>
-double getSum(T* p, int n, bool v4debug=true, bool vAbs = true)
-{
-    double sumN = 0;
-	T* pend = p + n;
-	int step = 1;
-    while (p<pend)
-    {
-        T temp = *p;
-        if (vAbs && temp < 0) if (v4debug)temp = 0;else temp *= -1;
-        sumN += temp;
-		if (v4debug) p += step++;
-		else p++;
-		if (step > 97) step = 1;
-    }
-    return sumN;
-}
+//template<typename T>
+//double getSum(T* p, int n, bool v4debug=true, bool vAbs = true)
+//{
+//    double sumN = 0;
+//	T* pend = p + n;
+//	int step = 1;
+//    while (p<pend)
+//    {
+//        T temp = *p;
+//        if (vAbs && temp < 0) if (v4debug)temp = 0;else temp *= -1;
+//        sumN += temp;
+//		if (v4debug) p += step++;
+//		else p++;
+//		if (step > 97) step = 1;
+//    }
+//    return sumN;
+//}
 
 template<typename T>
 void outPutSum(T* p, int n, const std::string& vInfor)

@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <time.h>
+#include <vector>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/types_c.h>
+#include "cudaUtility.h"
+#include "tensorNet.h"
+#include "Common.h"
+#include "FileFunction.h"
+#include "detection.h"
+
+int main(){
+    CConfiger* pConfiger = CConfiger::getOrCreateConfiger("../configer.txt");
+    SSD_Detection ssd_detection;
+    cv::Mat img = cv::imread("/home/nvidia/Program/api_server/tensorrtFrmame-master/4faces.jpg");
+    std::vector<int> hf_boxs;
+    std::vector<std::vector<int>> ldmk_boxes;
+
+    ssd_detection.detect_hf(img, hf_boxs);
+
+    for (int i = 0; i < hf_boxs.size(); i+=6) {
+        if (hf_boxs[i+5]==2){
+            std::vector<int> box_tmp = {hf_boxs[i],hf_boxs[i+1],hf_boxs[i+2],hf_boxs[i+3]};
+            std::cout << hf_boxs[i] << " " <<hf_boxs[i+1]<<" " <<hf_boxs[i+2]<<" " <<hf_boxs[i+3]<<std::endl;
+            ldmk_boxes.emplace_back(box_tmp);
+        }
+    }
+
+    std::vector<std::vector<int>>rects;
+    std::vector<std::vector<float>>angles;
+    ssd_detection.get_angles(img,ldmk_boxes,angles);
+    ssd_detection.get_ageGender(img,ldmk_boxes,angles);
+    return 0;
+}

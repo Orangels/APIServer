@@ -1,0 +1,6 @@
+syntax = "proto2";
+
+message C3DPara {
+  repeated  float wShpBase = 1;
+  repeated  float wExpBase = 2;
+}
