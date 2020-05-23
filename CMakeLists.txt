@@ -33,6 +33,7 @@ execute_process(COMMAND mkdir imgs_detections)
 
 
 if ("${CMAKE_SYSTEM}" MATCHES ".*tegra")
+    add_definitions(-DPLATFORM_TEGRA)
     set(trtLibPath /usr/lib/aarch64-linux-gnu)
     set(cppComLib ${cppCommonPath}/build/libCommon.so)
 #    execute_process(COMMAND  ln -s /srv/models ${CMAKE_SOURCE_DIR}/../../../models)
@@ -68,10 +69,16 @@ include_directories(
         /usr/include/python3.6m
         /usr/local/lib/python3.6/dist-packages/numpy/core/include
         ${CMAKE_SOURCE_DIR}/src/video_stream
+        ${CMAKE_SOURCE_DIR}/src/video_stream/DSIncludes
         /usr/local/include
         ${CUDA_INCLUDE_DIRS}
         src/box_tracking
         ${CMAKE_SOURCE_DIR}/pycode
+
+        /usr/include/gstreamer-1.0
+        /usr/include/glib-2.0
+        /usr/lib/aarch64-linux-gnu/glib-2.0/include
+        /usr/local/cuda/targets/aarch64-linux/include/
 
 )
 aux_source_directory(src DIR_SRC)

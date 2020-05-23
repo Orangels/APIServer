@@ -18,6 +18,7 @@
 #include "utils/match_id.h"
 #include <Python.h>
 
+#include "dsHandler.h"
 #include "detection.h"
 
 using namespace std;
@@ -37,10 +38,11 @@ class Dispatch
 
 //      total cam params
         vector<string> mCamPath; // 拉流地址
+        vector<dsHandler*> mDsHandlers;
         vector<cv::VideoWriter> mRTMPWriter; // 推流地址
         vector<bool> mCamLive;
 
-        vector<queue<cv::Mat>> mQueueCam;
+        vector<queue<cv::Mat>* > mQueueCam;
         vector<queue<cv::Mat>> mQueue_rtmp;
 
         vector<condition_variable*> mCon_not_full;
@@ -56,48 +58,49 @@ class Dispatch
 
 
 //        front cam params
-        queue<cv::Mat> mQueue_front;
-        queue<cv::Mat> mQueue_rtmp_front;
-
-        condition_variable con_front_not_full;
-        condition_variable con_front_not_empty;
-
-        condition_variable con_rtmp_front;
-
-        mutex myMutex_front;
-        mutex myMutex_rtmp_front;
-
-        mutex rtmpMutex_front;
-
-        cv::Mat rtmp_front_img;
-
-        bool camera_front;
+//        queue<cv::Mat> mQueue_front;
+//        queue<cv::Mat> mQueue_rtmp_front;
+//
+//        condition_variable con_front_not_full;
+//        condition_variable con_front_not_empty;
+//
+//        condition_variable con_rtmp_front;
+//
+//        mutex myMutex_front;
+//        mutex myMutex_rtmp_front;
+//
+//        mutex rtmpMutex_front;
+//
+//        cv::Mat rtmp_front_img;
+//
+//        bool camera_front;
 
     //        middle cam params
-        queue<cv::Mat> mQueue_mid;
-        queue<cv::Mat> mQueue_rtmp_mid;
-
-        condition_variable con_mid_not_full;
-        condition_variable con_mid_not_empty;
-
-        condition_variable con_rtmp_mid;
-
-        mutex myMutex_mid;
-        mutex myMutex_rtmp_mid;
-
-        mutex rtmpMutex_mid;
-
-        cv::Mat rtmp_mid_img;
-
-        bool camera_mid;
+//        queue<cv::Mat> mQueue_mid;
+//        queue<cv::Mat> mQueue_rtmp_mid;
+//
+//        condition_variable con_mid_not_full;
+//        condition_variable con_mid_not_empty;
+//
+//        condition_variable con_rtmp_mid;
+//
+//        mutex myMutex_mid;
+//        mutex myMutex_rtmp_mid;
+//
+//        mutex rtmpMutex_mid;
+//
+//        cv::Mat rtmp_mid_img;
+//
+//        bool camera_mid;
 
 //        rpc params
 
 
-        Match_ID* matcher;
+//        Match_ID* matcher;
 
 private:
         Cconfig labels = Cconfig("../cfg/process.ini");
+        Cconfig dbLabels = Cconfig("/srv/media_info.txt");
         int frame_count;
 
         int frames_skip;
@@ -109,14 +112,14 @@ private:
         void RPCServer();
 
 
-    condition_variable vCon_not_full_0, vCon_not_full_1, vCon_not_full_2, vCon_not_full_3;
-    condition_variable vCon_not_empty_0, vCon_not_empty_1, vCon_not_empty_2, vCon_not_empty_3;
-    condition_variable vCon_rtmp_0, vCon_rtmp_1, vCon_rtmp_2, vCon_rtmp_3;
-    mutex vConMutexCam_0, vConMutexCam_1, vConMutexCam_2, vConMutexCam_3;
-    mutex vConMutexRTMP_0, vConMutexRTMP_1, vConMutexRTMP_2, vConMutexRTMP_3;
-    mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
-    cv::VideoWriter writer_0, writer_1, writer_2, writer_3;
-//    SSD_Detection ssd_detection_0, ssd_detection_1;
+        condition_variable vCon_not_full_0, vCon_not_full_1, vCon_not_full_2, vCon_not_full_3;
+        condition_variable vCon_not_empty_0, vCon_not_empty_1, vCon_not_empty_2, vCon_not_empty_3;
+        condition_variable vCon_rtmp_0, vCon_rtmp_1, vCon_rtmp_2, vCon_rtmp_3;
+        mutex vConMutexCam_0, vConMutexCam_1, vConMutexCam_2, vConMutexCam_3;
+        mutex vConMutexRTMP_0, vConMutexRTMP_1, vConMutexRTMP_2, vConMutexRTMP_3;
+        mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
+        cv::VideoWriter writer_0, writer_1, writer_2, writer_3;
+        dsHandler *dsHandler_0, *dsHandler_1, *dsHandler_2, *dsHandler_3;
 //        Engine_api * pyEngineAPI;
 //
 //        Engine_api * pyEngineAPI_0;
