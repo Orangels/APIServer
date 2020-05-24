@@ -26,7 +26,10 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/shm.h>
-#include "utils/track.h"
+
+//#include "utils/track.h"
+//#include "utils/vis.h"
+#include "tasks/imageHandler.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -326,7 +329,8 @@ void Dispatch::ConsumeImage(int mode){
     condition_variable *con_v_wait, *con_v_notification;
     cv::Mat* rtmp_img;
     cv::Mat ret_img;
-    SSD_Detection ssd_detection = SSD_Detection();
+
+    imageHandler vImageHandler;
 
     lock = mConMutexCam[mode];
     queue = mQueueCam[mode];
@@ -335,8 +339,6 @@ void Dispatch::ConsumeImage(int mode){
     con_v_notification = mCon_not_full[mode];
     con_rtmp = mCon_rtmp[mode];
     rtmp_img = &mRtmpImg[mode];
-
-    Track *head_tracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
 
     cout << "ConsumeImage  start " << endl;
     cout << lock << endl;
@@ -361,44 +363,8 @@ void Dispatch::ConsumeImage(int mode){
         //        TODO 业务逻辑
         ret_img = frame.clone();
         if (stoi(labels["inference_switch"])){
-            std::vector<int> hf_boxs;
-            std::vector<std::vector<int>> ldmk_boxes;
-            int64_t start = getCurrentTime();
-            ssd_detection.detect_hf(ret_img, hf_boxs);
-            for (int i = 0; i < hf_boxs.size(); i+=6) {
-                if (hf_boxs[i+5]==2){
-                    std::vector<int> box_tmp = {hf_boxs[i],hf_boxs[i+1],hf_boxs[i+2],hf_boxs[i+3]};
-                    if (ldmk_boxes.size() < 8) ldmk_boxes.emplace_back(box_tmp);
-                }
-                cv::Point p1, p2;
-                p1.x = hf_boxs[i];
-                p1.y = hf_boxs[i+1];
-                p2.x = hf_boxs[i+2];
-                p2.y = hf_boxs[i+3];
-                cv::Scalar color = cv::Scalar(0, 255, 255);
-                if (hf_boxs[i+5]==2) color = cv::Scalar(0, 255, 0);
-                cv::rectangle(ret_img, p1, p2, color, 2, 1, 0);
-            }
-
-            head_tracker->run(hf_boxs, 1);
-
-            if (ldmk_boxes.size()>0){
-                std::vector<std::vector<int>>rects;
-                std::vector<std::vector<float>>angles;
-                int64_t start_kpt = getCurrentTime();
-                ssd_detection.get_angles(ret_img,ldmk_boxes,angles);
-                int64_t start_age = getCurrentTime();
-                ssd_detection.get_ageGender(ret_img,ldmk_boxes,angles);
-            }
-            cout <<"mode : " << mode << " total cost : " << getCurrentTime()-start << endl;
-        }
-
-
-        if (stoi(labels["SAVE_IAMGE"]))
-        {
-            string img_path, img_path_center, img_path_ori;
-            img_path = "./imgs/" + to_string(num+10000) + "_" + to_string(mode) + ".jpg";
-            cv::imwrite(img_path, frame);
+            vImageHandler.run(ret_img);
+            vImageHandler.vis(ret_img);
         }
 
         if (rtmp_mode == 1) {

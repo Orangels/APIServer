@@ -9,6 +9,8 @@
 #include "box_tracking.h"
 #include "structures/structs.h"
 
+using namespace boxTracking;
+
 class Track {
 public:
     Track(int head_track_mistimes, int w, int h);
@@ -18,7 +20,7 @@ public:
     void run(vector<Box>);
 
     int img_w, img_h;
-    vector<Rect> detection_rects;
+    vector<boxTracking::Rect> detection_rects;
     vector<int> tracking_result, delete_tracking_id;
     BoxTracker* tracker;
 };

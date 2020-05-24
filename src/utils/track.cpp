@@ -4,6 +4,8 @@
 
 #include "utils/track.h"
 
+using namespace boxTracking;
+
 Track::Track(int head_track_mistimes, int w, int h) {
     tracker = new BoxTracker(4.0, 1.0, head_track_mistimes);
     img_w = w;

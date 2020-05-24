@@ -2,6 +2,7 @@
 //#include "face_common.h"
 
 using namespace std;
+using namespace boxTracking;
 
 float BoxTracker::intersection_over_union(Rect box1,Rect box2)
 {

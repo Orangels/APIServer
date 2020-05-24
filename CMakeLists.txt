@@ -102,6 +102,6 @@ add_executable(DPH tools/main.cpp ${DIR_SRC} ${sources}
 src/utils/mat2numpy.cpp src/utils/vis.cpp src/utils/split.cpp src/utils/match_id.cpp src/utils/trajectory.cpp
 include/structures/structs.h
 src/box_tracking/box_tracking.cpp
-src/box_tracking/box_tracking.h src/box_tracking/Hungarian/Hungarian.cpp
+src/box_tracking/box_tracking.h src/box_tracking/Hungarian/Hungarian.cpp src/tasks/imageHandler.cpp
 src/utils/track.cpp ${cppCommonPath}/build/libCommon.so)
 
