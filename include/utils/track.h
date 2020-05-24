@@ -14,6 +14,7 @@ public:
     Track(int head_track_mistimes, int w, int h);
     ~Track();
 
+    void run(std::vector<int> hf_boxs, int numClass);
     void run(vector<Box>);
 
     int img_w, img_h;

@@ -12,6 +12,18 @@ Track::Track(int head_track_mistimes, int w, int h) {
 
 Track::~Track() = default;
 
+void Track::run(std::vector<int> hf_boxs, int numClass) {
+    vector<Box> boxes_xxyy;
+
+    for (int i = 0; i < hf_boxs.size(); i+=6) {
+        if (hf_boxs[i+5]==numClass){
+            Box box = {hf_boxs[i], hf_boxs[i+1], hf_boxs[i+2], hf_boxs[i+3]};
+            boxes_xxyy.emplace_back(box);
+        }
+    }
+    run(boxes_xxyy);
+}
+
 void Track::run(vector<Box> boxes_xxyy) {
     int num_del;
     Rect rect;

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/shm.h>
+#include "utils/track.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -335,6 +336,8 @@ void Dispatch::ConsumeImage(int mode){
     con_rtmp = mCon_rtmp[mode];
     rtmp_img = &mRtmpImg[mode];
 
+    Track *head_tracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
+
     cout << "ConsumeImage  start " << endl;
     cout << lock << endl;
     cout << con_v_wait << endl;
@@ -376,6 +379,8 @@ void Dispatch::ConsumeImage(int mode){
                 if (hf_boxs[i+5]==2) color = cv::Scalar(0, 255, 0);
                 cv::rectangle(ret_img, p1, p2, color, 2, 1, 0);
             }
+
+            head_tracker->run(hf_boxs, 1);
 
             if (ldmk_boxes.size()>0){
                 std::vector<std::vector<int>>rects;
