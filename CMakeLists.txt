@@ -79,6 +79,7 @@ include_directories(
         /usr/include/glib-2.0
         /usr/lib/aarch64-linux-gnu/glib-2.0/include
         /usr/local/cuda/targets/aarch64-linux/include/
+        /usr/local/ffmpeg/include
 
 )
 aux_source_directory(src DIR_SRC)

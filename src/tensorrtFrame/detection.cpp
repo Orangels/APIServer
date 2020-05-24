@@ -255,7 +255,7 @@ int ssdInference(int vBatchSize, int vHeight, int vWidth, uchar* vpImgData,
 					pBoxScoreCls[4] = output[2];
 					pBoxScoreCls[5] = output[1];
 //					if (1 == iter % 50) _outputSSD(output[3], output[4], output[5], output[6], output[2], output[1]);
-					_outputSSD(output[3], output[4], output[5], output[6], output[2], output[1]);
+//					_outputSSD(output[3], output[4], output[5], output[6], output[2], output[1]);
 					pBoxScoreCls += 6;
 				}
 				output += 7;
@@ -274,10 +274,10 @@ SSD_Detection ::SSD_Detection()
     g_modelPrefix = m_pconfiger->readValue("ssd_detection_modelPrefix");
     point_g_modelPrefix = m_pconfiger->readValue("point_modelPrefix");
     initialize(g_modelPrefix.c_str(), "ssdInference");
-    std::cout <<g_modelPrefix<<std::endl;
+//    std::cout <<g_modelPrefix<<std::endl;
 
     initialize(point_g_modelPrefix.c_str(), "keyPointInference");
-    std::cout <<point_g_modelPrefix<<std::endl;
+//    std::cout <<point_g_modelPrefix<<std::endl;
     ageGender_g_modelPrefix = m_pconfiger->readValue("ageGender_modelPrefix");
     initialize(ageGender_g_modelPrefix.c_str(), "ageGenderInference");
 }
@@ -288,7 +288,7 @@ SSD_Detection::~SSD_Detection()
 }
 
 
-void SSD_Detection::detect_hf(cv::Mat &image, std::vector<int>& hf_boxs)
+void SSD_Detection::detect_hf(cv::Mat image, std::vector<int>& hf_boxs)
 //void SSD_Detection::detect_hf()
 {
 //    std::cout <<"detect_hf"<<std::endl;
@@ -306,8 +306,8 @@ void SSD_Detection::detect_hf(cv::Mat &image, std::vector<int>& hf_boxs)
 	int numDetection = 0, nDets[64];
 	numDetection = ssdInference(g_batchSize, faceImg.rows, faceImg.cols, imgs.data(), box, nDets/*reFace.data*/);
 
-	std::cout << getThreadID() << " numDetection: " << numDetection << ": ";
-	for (int i = 0; i < g_batchSize; ++i) std::cout << nDets[i] << ", "<< std::endl;
+//	std::cout << getThreadID() << " numDetection: " << numDetection << ": ";
+//	for (int i = 0; i < g_batchSize; ++i) std::cout << nDets[i] << ", "<< std::endl;
 	for (int j = 0; j < numDetection; ++j) {
 //		std::cout << "********" << std::endl;
 //		std::cout << box[0]<< " : " << box[1] << " , " << box[2] << " , " << box[3] << " , " << box[4] << " , " << box[5] << " , " << std::endl;
@@ -324,7 +324,7 @@ void SSD_Detection::detect_hf(cv::Mat &image, std::vector<int>& hf_boxs)
 }
 
 
-void SSD_Detection::get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& angles)
+void SSD_Detection::get_angles(cv::Mat image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& angles)
 {
 	cv::Mat img = image.clone();
     img.convertTo(img, CV_32FC3);
@@ -404,7 +404,7 @@ void SSD_Detection::get_angles(cv::Mat &image, std::vector<std::vector<int>>& re
 //	printf("%d, ageGenderInference result sumabs = %.2f", g_batchSize, getSum(r.data(), r.size()));
 }
 
-void SSD_Detection::get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos)
+void SSD_Detection::get_ageGender(cv::Mat image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos)
 {
     int vw = 112, vh = 112;
 	std::vector<float> r(64*56*56);//64, 56, 56

@@ -34,6 +34,8 @@ include_directories(
         /usr/include/glib-2.0
         ${SYS_USR_LIB}/glib-2.0/include
         /usr/local/cuda/targets/aarch64-linux/include/
+        /usr/local/ffmpeg/include
+        /usr/local/include
 )
 
 file(GLOB sources *.cpp base64/*cpp)
@@ -56,6 +58,14 @@ target_link_libraries(videoStream ${OpenCV_LIBS}
         ${SYS_LIB}/libpcre.so.3
         ${OpenCV_LIBS}
         cudart
+        /usr/local/ffmpeg/lib/libavcodec.so
+        /usr/local/ffmpeg/lib/libavdevice.so
+        /usr/local/ffmpeg/lib/libavfilter.so
+        /usr/local/ffmpeg/lib/libavformat.so
+        /usr/local/ffmpeg/lib/libavutil.so
+        /usr/local/ffmpeg/lib/libpostproc.so
+        #        /usr/local/ffmpeg/lib/libswresample.so
+        /usr/local/ffmpeg/lib/libswscale.so
         )
 
 

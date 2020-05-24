@@ -14,10 +14,10 @@ class SSD_Detection
 public:
     SSD_Detection();
     ~SSD_Detection();
-    void detect_hf(cv::Mat &image, std::vector<int>& hf_boxs);
+    void detect_hf(cv::Mat image, std::vector<int>& hf_boxs);
 //    void detect_hf();
-    void get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& angles);
-    void get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos);
+    void get_angles(cv::Mat image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& angles);
+    void get_ageGender(cv::Mat image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos);
     void get_features(std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& features);
     //void detect_hand(cv::Mat &image, std::vector<float>& hand_boxs);
     //void detect_hop(cv::Mat &image, std::vector<float>& hop_boxs);
