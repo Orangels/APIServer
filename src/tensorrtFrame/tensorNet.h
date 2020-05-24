@@ -1,4 +1,6 @@
 //#include "pluginImplement.h"
+#ifndef __TENSOR_NET_H__
+#define __TENSOR_NET_H__
 #include "ImagePreprocessor.h"
 #include "affineInterface.h"
 #include "NvCaffeParser.h"
@@ -122,5 +124,5 @@ private:
 };
 
 
-//#endif
+#endif
 

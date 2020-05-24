@@ -8,16 +8,39 @@
 #include "tensorNet.h"
 #include "Common.h"
 #include "FileFunction.h"
-#include "detection.h"
+#include "engineApi.h"
 
 int main(){
     CConfiger* pConfiger = CConfiger::getOrCreateConfiger("../configer.txt");
-    SSD_Detection ssd_detection;
+    Engine_Api engine_api;
     cv::Mat img = cv::imread("/home/nvidia/Program/api_server/tensorrtFrmame-master/4faces.jpg");
+
+    //test for DHP  API
+//    std::vector<int> hf_boxs;
+//    std::vector<std::vector<int>> ldmk_boxes;
+//    engine_api.detect_headface(img, hf_boxs);
+//
+//    for (int i = 0; i < hf_boxs.size(); i+=6) {
+//        if (hf_boxs[i+5]==2){
+//            std::vector<int> box_tmp = {hf_boxs[i],hf_boxs[i+1],hf_boxs[i+2],hf_boxs[i+3]};
+//            std::cout << hf_boxs[i] << " " <<hf_boxs[i+1]<<" " <<hf_boxs[i+2]<<" " <<hf_boxs[i+3]<<std::endl;
+//            ldmk_boxes.emplace_back(box_tmp);
+//        }
+//    }
+//
+//    std::vector<std::vector<int>>rects;
+//    std::vector<std::vector<float>>angles;
+//    engine_api.get_angles(img,ldmk_boxes,angles);
+//    engine_api.get_ageGender(img,ldmk_boxes,angles);
+
+
+    // test for  wiwide API
+    float * hf_boxs1;
+    engine_api.detect_headface(img, hf_boxs1);
+
     std::vector<int> hf_boxs;
     std::vector<std::vector<int>> ldmk_boxes;
-
-    ssd_detection.detect_hf(img, hf_boxs);
+    engine_api.detect_headface(img, hf_boxs);
 
     for (int i = 0; i < hf_boxs.size(); i+=6) {
         if (hf_boxs[i+5]==2){
@@ -27,9 +50,11 @@ int main(){
         }
     }
 
-    std::vector<std::vector<int>>rects;
-    std::vector<std::vector<float>>angles;
-    ssd_detection.get_angles(img,ldmk_boxes,angles);
-    ssd_detection.get_ageGender(img,ldmk_boxes,angles);
+    float * rects;
+    float * angles;
+
+    engine_api.get_angles(img,ldmk_boxes,angles);
+    engine_api.get_ageGender(img,ldmk_boxes,angles);
+
     return 0;
 }

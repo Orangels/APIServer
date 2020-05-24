@@ -107,8 +107,10 @@ GstPadProbeReturn osd_sink_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * inf
     if (ds->pic_num == 10000) ds->pic_num = 0;
     std::unique_lock<std::mutex> guard(ds->myMutex);
     if (ds->pic_num % ds->frame_skip == 0){
-        ds->imgQueue.push(frame);
-        ds->con_v_notification.notify_all();
+        if (ds->imgQueue.size()<50){
+            ds->imgQueue.push(frame);
+            ds->con_v_notification.notify_all();
+        }
         guard.unlock();
     }
 
@@ -144,9 +146,10 @@ dsHandler::dsHandler(){
 
 }
 
-dsHandler::dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC, int camNum, int mode) :
+dsHandler::dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC,
+        int camNum, int mode, int vFrame_skip) :
         RTSPCAM(vRTSPCAM), MUXER_OUTPUT_WIDTH(vMUXER_OUTPUT_WIDTH), MUXER_OUTPUT_HEIGHT(vMUXER_OUTPUT_HEIGHT),
-        MUXER_BATCH_TIMEOUT_USEC(vMUXER_BATCH_TIMEOUT_USEC){
+        MUXER_BATCH_TIMEOUT_USEC(vMUXER_BATCH_TIMEOUT_USEC), frame_skip(vFrame_skip){
 
     gst_init(NULL, NULL);
 

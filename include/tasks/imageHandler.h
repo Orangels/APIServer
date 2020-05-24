@@ -7,7 +7,7 @@
 #include "utils/track.h"
 #include "utils/vis.h"
 #include "config.h"
-#include "detection.h"
+#include "engineApi.h"
 
 using namespace cv;
 
@@ -21,7 +21,7 @@ class imageHandler{
         cv::Mat frame;
 
     private:
-        SSD_Detection *trEngine;
+        Engine_Api *trEngine;
         Track *headTracker;
         std::vector<int> hf_boxs;
         std::vector<std::vector<int>> ldmk_boxes;

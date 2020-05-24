@@ -4,15 +4,6 @@
 //
 #include <iostream>
 #include <iomanip>
-//#include <numpy/arrayobject.h>
-#include "dispatch.h"
-#include "config.h"
-#include "Common.h"
-#include "utils/mat2numpy.h"
-#include "utils/vis.h"
-#include "utils/split.h"
-#include "utils/track.h"
-#include "utils/match_id.h"
 #include <sys/time.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -27,8 +18,11 @@
 #include <fcntl.h>
 #include <sys/shm.h>
 
-//#include "utils/track.h"
-//#include "utils/vis.h"
+#include "dispatch.h"
+#include "config.h"
+#include "Common.h"
+#include "utils/vis.h"
+
 #include "tasks/imageHandler.h"
 
 #include "rapidjson/document.h"
@@ -63,15 +57,18 @@ Dispatch::Dispatch()
     string path_0 = dbLabels["video_path_0"];
     string path_1 = dbLabels["video_path_1"];
 
-    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, 1);
-    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, 1);
+    mCamLive = {path_0!="", path_1!="", false, false};
+
+    path_0 = mCamLive[0] ? "rtsp://172.16.104.175:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream" : "";
+    path_1 = mCamLive[1] ? "rtsp://172.16.104.178:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream" : "";
+
+    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, 1, frames_skip);
+    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, 1, frames_skip);
 //    dsHandler_0 = new dsHandler();
 //    dsHandler_1 = new dsHandler();
     dsHandler_2 = new dsHandler();
     dsHandler_3 = new dsHandler();
 
-    dsHandler_0->frame_skip = frames_skip;
-    dsHandler_1->frame_skip = frames_skip;
 
     mDsHandlers.resize(4);
     mCamLive.resize(4);
@@ -88,9 +85,6 @@ Dispatch::Dispatch()
     mConMutexRTMP.resize(4);
     mRtmpMutex.resize(4);
 
-
-
-    mCamLive = {path_0!="", path_1!="", false, false};
 
     mCon_not_full = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
     mDsHandlers = {dsHandler_0, dsHandler_1, dsHandler_2, dsHandler_3};
@@ -136,16 +130,10 @@ Dispatch::Dispatch()
 }
 Dispatch::~Dispatch() = default;
 
-void Dispatch::run()
-{
-
-}
-void Dispatch::test()
-{
-    cout<< "test in "<<endl;
-}
-
 void Dispatch::RPCServer(){
+    int out_w = stoi(labels["OUT_W"]);  //2880
+    int out_h = stoi(labels["OUT_H"]);  //960
+
     vector<thread> threadArr;
     int socketPort = stoi(labels["SPORT"]);
     int socketQueue = stoi(labels["SQUEUE"]);
@@ -235,20 +223,65 @@ void Dispatch::RPCServer(){
         send(conn, respBuffer, strlen(respBuffer) , 0);
         close(conn);
 
-        if (is_h264){
-            gs_rtsp_str = "rtspsrc location=" + rtsp_str + " latency=0 ! rtph264depay ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)1280, height=(int)720, format=(string)BGRx ! videoconvert ! appsink";
-        } else{
-            gs_rtsp_str = "rtspsrc location=" + rtsp_str + " latency=0 ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)1280, height=(int)720, format=(string)BGRx ! videoconvert ! appsink";
-        }
         string add = "add";
         isAdd = add.compare(cmd_str) == 0;
 
-        mCamLive[cam_id] = isAdd;
-        mCamPath[cam_id] = gs_rtsp_str;
+        if (isAdd){
+            if (!mCamLive[cam_id]){
+                mCamLive[cam_id] = isAdd;
+                mCamPath[cam_id] = rtsp_str;
+                cout << isAdd << endl;
+                cout << "socket Add cam " << cam_id << endl ;
+                switch (cam_id){
+                    case 0:
+                        dsHandler_0 = new dsHandler (rtsp_str,out_w,out_h, 4000000, cam_id, is_h264 ? 0 : 1, frames_skip);
 
-        threadArr.emplace_back(&Dispatch::ProduceImage, this, cam_id);
-        threadArr.emplace_back(&Dispatch::ConsumeImage, this, cam_id);
-        threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, cam_id);
+                        mDsHandlers[cam_id] = dsHandler_0;
+                        mCon_not_empty[cam_id] = &dsHandler_0->con_v_notification;
+                        mConMutexCam[cam_id] = &dsHandler_0->myMutex;
+                        mQueueCam[cam_id] = &dsHandler_0->imgQueue;
+                        break;
+                    case 1:
+                        dsHandler_1 = new dsHandler (rtsp_str,out_w,out_h, 4000000, cam_id, is_h264 ? 0 : 1, frames_skip);
+
+                        mDsHandlers[cam_id] = dsHandler_1;
+                        mCon_not_empty[cam_id] = &dsHandler_1->con_v_notification;
+                        mConMutexCam[cam_id] = &dsHandler_1->myMutex;
+                        mQueueCam[cam_id] = &dsHandler_1->imgQueue;
+                        break;
+                    case 2:
+                        dsHandler_2 = new dsHandler (rtsp_str,out_w,out_h, 4000000, cam_id, is_h264 ? 0 : 1, frames_skip);
+
+                        mDsHandlers[cam_id] = dsHandler_2;
+                        mCon_not_empty[cam_id] = &dsHandler_2->con_v_notification;
+                        mConMutexCam[cam_id] = &dsHandler_2->myMutex;
+                        mQueueCam[cam_id] = &dsHandler_2->imgQueue;
+                        break;
+                    case 3:
+                        dsHandler_3 = new dsHandler (rtsp_str,out_w,out_h, 4000000, cam_id, is_h264 ? 0 : 1, frames_skip);
+
+                        mDsHandlers[cam_id] = dsHandler_3;
+                        mCon_not_empty[cam_id] = &dsHandler_3->con_v_notification;
+                        mConMutexCam[cam_id] = &dsHandler_3->myMutex;
+                        mQueueCam[cam_id] = &dsHandler_3->imgQueue;
+                        break;
+                    default:
+                        break;
+                }
+
+                threadArr.emplace_back(&Dispatch::ProduceImage, this, cam_id);
+                threadArr.emplace_back(&Dispatch::ConsumeImage, this, cam_id);
+                threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, cam_id);
+            }
+
+        } else{
+            cout << "socket Del cam " << cam_id << endl ;
+            mCamLive[cam_id] = false;
+            mDsHandlers[cam_id] ->finish();
+            mDsHandlers[cam_id] = nullptr;
+            cout << "del cam_id : " << cam_id << endl;
+        }
+
 
         cout << gs_rtsp_str <<endl;
 
@@ -303,13 +336,16 @@ void Dispatch::ConsumeRTMPImage(int mode){
         num++;
         if (num == 10000) num = 0;
     }
+
+    cout << "ConsumeRTMPImage finish "<< mode << endl;
+
 }
 
 void Dispatch::ProduceImage(int mode){
-
+    cout << "produceImage "<< mode << " start" << endl;
     dsHandler* mDsHandler = mDsHandlers[mode];
     mDsHandler->run();
-    cout << "produceImage "<< mode << " finsh" << endl;
+    cout << "produceImage "<< mode << " finish" << endl;
 
 }
 
@@ -359,7 +395,6 @@ void Dispatch::ConsumeImage(int mode){
 //        con_v_notification->notify_all();
         guard.unlock();
 
-
         //        TODO 业务逻辑
         ret_img = frame.clone();
         if (stoi(labels["inference_switch"])){
@@ -381,15 +416,16 @@ void Dispatch::ConsumeImage(int mode){
         if (num == 10000) num = 0;
     }
 
+    cout << " ConsumeImage finish "<< mode << endl;
+
 }
 
-void Dispatch::multithreadTest(){
+void Dispatch::run(){
 
     vector<thread> threadArr;
+    threadArr.emplace_back(&Dispatch::RPCServer, this);
+
     for (int i = 0; i < mCamLive.size(); ++i) {
-        if (i==0){
-            threadArr.emplace_back(&Dispatch::RPCServer, this);
-        }
         if (mCamLive[i]){
             cout << "start woker thread " << endl;
             threadArr.emplace_back(&Dispatch::ProduceImage, this, i);

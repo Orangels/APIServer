@@ -37,11 +37,11 @@ class dsHandler {
         string RTSPCAM;
 
         dsHandler();
-        dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC, int camNum, int mode);
+        dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC, int camNum, int mode, int vFrame_skip);
         dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC, GstPadProbeCallback callback, int mode);
 
         ~dsHandler(){
-
+            cout << "dshandler del" << endl;
         };
         void run();
         void finish();

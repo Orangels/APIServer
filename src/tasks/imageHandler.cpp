@@ -3,7 +3,7 @@
 imageHandler::imageHandler(){
     Cconfig labels = Cconfig("../cfg/process.ini");
 
-    trEngine = new SSD_Detection();
+    trEngine = new Engine_Api();
     headTracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
 
 }
@@ -11,6 +11,7 @@ imageHandler::imageHandler(){
 imageHandler::~imageHandler(){
     delete trEngine;
     delete headTracker;
+    std::cout << "del imageHandler" << endl;
 }
 
 void imageHandler::run(cv::Mat ret_img){
@@ -19,7 +20,7 @@ void imageHandler::run(cv::Mat ret_img){
     rects.clear();
     angles.clear();
     
-    trEngine->detect_hf(ret_img, hf_boxs);
+    trEngine->detect_headface(ret_img, hf_boxs);
     for (int i = 0; i < hf_boxs.size(); i+=6) {
         if (hf_boxs[i+5]==2){
             std::vector<int> box_tmp = {hf_boxs[i],hf_boxs[i+1],hf_boxs[i+2],hf_boxs[i+3]};

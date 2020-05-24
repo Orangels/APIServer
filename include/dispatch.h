@@ -14,12 +14,10 @@
 #include <vector>
 #include <condition_variable>
 #include "config.h"
-//#include "utils/track.h"
-//#include "utils/match_id.h"
+
 #include <Python.h>
 
 #include "dsHandler.h"
-#include "detection.h"
 #include "rtmpHandler.h"
 
 using namespace std;
@@ -29,11 +27,8 @@ class Dispatch
         Dispatch();
         ~Dispatch();
         void run();
-        void test();
-        int engine_Test();
 
         //    ls add
-        void multithreadTest();
         int mQueueArrLen = 2;
         int mQueueLen = 5;
 
@@ -80,11 +75,6 @@ private:
         cv::VideoWriter writer_0, writer_1, writer_2, writer_3;
         dsHandler *dsHandler_0, *dsHandler_1, *dsHandler_2, *dsHandler_3;
         rtmpHandler *rtmpHandler_0, *rtmpHandler_1, *rtmpHandler_2, *rtmpHandler_3;
-//        Engine_api * pyEngineAPI;
-//
-//        Engine_api * pyEngineAPI_0;
-//        Engine_api * pyEngineAPI_1;
-//        Engine_api * pyEngineAPI_2;
 
 
 };
