@@ -59,6 +59,7 @@ Dispatch::Dispatch()
 
     mCamLive = {path_0!="", path_1!="", false, false};
 
+//    TODO 数据库视频流格式修改
     path_0 = mCamLive[0] ? "rtsp://172.16.104.175:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream" : "";
     path_1 = mCamLive[1] ? "rtsp://172.16.104.178:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream" : "";
 

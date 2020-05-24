@@ -14,11 +14,7 @@ extern "C"
 #include <libavformat/avformat.h>
 #include <libavutil/opt.h>
 }
-//#pragma comment(lib, "swscale.lib")
-//#pragma comment(lib, "avcodec.lib")
-//#pragma comment(lib, "avutil.lib")
-//#pragma comment(lib, "avformat.lib")
-//#pragma comment(lib,"opencv_world300.lib")
+
 using namespace std;
 
 class rtmpHandler {
