@@ -38,6 +38,10 @@ void imageHandler::run(cv::Mat ret_img){
 }
 
 void imageHandler::vis(cv::Mat& ret_img){
-//    vis_box(ret_img, hf_boxs, headTracker->tracking_result);
-    vis_box_angles(ret_img, hf_boxs, angles, headTracker->tracking_result);
+    if (angles.size()>0){
+        vis_box_angles(ret_img, hf_boxs, angles, headTracker->tracking_result);
+    } else{
+        vis_box(ret_img, hf_boxs, headTracker->tracking_result);
+    }
+
 }
