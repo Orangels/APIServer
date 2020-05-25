@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/shm.h>
+#include <chrono>
 
 #include "dispatch.h"
 #include "config.h"
@@ -427,6 +428,8 @@ void Dispatch::run(){
             threadArr.emplace_back(&Dispatch::ProduceImage, this, i);
             threadArr.emplace_back(&Dispatch::ConsumeImage, this, i);
             threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, i);
+
+            this_thread::sleep_for(chrono::seconds(10));
         }
     }
 
