@@ -296,8 +296,6 @@ int TensorNet::caculateDetail3Dkeypoints(int vBatchSize, int* vpBoxes)
         para.Clear();
     }
     caculate3Dkeypoints((float*)modelIObuffers.back(), vBatchSize, dDst, m_shpBase, m_expBase, cudaStream);
-    //xxs add
-    std::cout << "modelOutputBytes" <<modelOutputBytes<<std::endl;
     cudaMemcpyAsync(resultBufferHost, modelIObuffers.back(), modelOutputBytes*vBatchSize, cudaMemcpyDeviceToHost, cudaStream);
 //    cudaMemcpyAsync(resultBufferHost, dDst, 219*vBatchSize, cudaMemcpyDeviceToHost, cudaStream);
     return modelOutputBytes*vBatchSize;
