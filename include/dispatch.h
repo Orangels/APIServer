@@ -36,7 +36,7 @@ class Dispatch
         vector<string> mCamPath; // 拉流地址
         vector<dsHandler*> mDsHandlers;
         vector<cv::VideoWriter> mRTMPWriter; // 推流地址
-        vector<rtmpHandler*> mRtmpHandlers; // 推流地址
+//        vector<rtmpHandler*> mRtmpHandlers; // 推流地址
         vector<bool> mCamLive;
 
         vector<queue<cv::Mat>* > mQueueCam;
@@ -74,7 +74,7 @@ private:
         mutex vRtmpMutex_0, vRtmpMutex_1, vRtmpMutex_2, vRtmpMutex_3;
         cv::VideoWriter writer_0, writer_1, writer_2, writer_3;
         dsHandler *dsHandler_0, *dsHandler_1, *dsHandler_2, *dsHandler_3;
-        rtmpHandler *rtmpHandler_0, *rtmpHandler_1, *rtmpHandler_2, *rtmpHandler_3;
+//        rtmpHandler *rtmpHandler_0, *rtmpHandler_1, *rtmpHandler_2, *rtmpHandler_3;
 
 
 };

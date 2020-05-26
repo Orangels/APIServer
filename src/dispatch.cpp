@@ -60,17 +60,11 @@ Dispatch::Dispatch()
 
     mCamLive = {path_0!="", path_1!="", false, false};
 
-    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, 1, frames_skip);
-    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, 1, frames_skip);
-    dsHandler_2 = new dsHandler();
-    dsHandler_3 = new dsHandler();
-
-
     mDsHandlers.resize(4);
     mCamLive.resize(4);
     mCamPath.resize(4);
     mRTMPWriter.resize(4);
-    mRtmpHandlers.resize(4);
+//    mRtmpHandlers.resize(4);
     mQueueCam.resize(4);
     mQueue_rtmp.resize(4);
 
@@ -81,6 +75,39 @@ Dispatch::Dispatch()
     mConMutexRTMP.resize(4);
     mRtmpMutex.resize(4);
 
+
+    if (rtmp_mode){
+        std::string rtmpPath_0 = labels["RTMP_PATH_0"]; //  rtmp://127.0.0.1:1935/hls/room
+        std::string rtmpPath_1 = labels["RTMP_PATH_1"];
+        std::string rtmpPath_2 = labels["RTMP_PATH_2"]; //  rtmp://127.0.0.1:1935/hls/room
+        std::string rtmpPath_3 = labels["RTMP_PATH_3"];
+//        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! nvv4l2h264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
+        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! omxh264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
+
+//        rtmpHandler_0 = new rtmpHandler("",rtmpPath_0,out_w,out_h,fps);
+//        rtmpHandler_1 = new rtmpHandler("",rtmpPath_1,out_w,out_h,fps);
+//        rtmpHandler_2 = new rtmpHandler("",rtmpPath_2,out_w,out_h,fps);
+//        rtmpHandler_3 = new rtmpHandler("",rtmpPath_3,out_w,out_h,fps);
+
+        rtmpPath_0 =  GSTParams + rtmpPath_0;
+        rtmpPath_1 =  GSTParams + rtmpPath_1;
+        rtmpPath_2 =  GSTParams + rtmpPath_2;
+        rtmpPath_3 =  GSTParams + rtmpPath_3;
+
+        writer_0 = cv::VideoWriter(rtmpPath_0,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
+        writer_1 = cv::VideoWriter(rtmpPath_1,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
+//        writer_2 = cv::VideoWriter(rtmpPath_2,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
+//        writer_3 = cv::VideoWriter(rtmpPath_3,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
+
+        mRTMPWriter = {writer_0, writer_1, writer_2, writer_3};
+//        mRtmpHandlers = {rtmpHandler_0, rtmpHandler_1, rtmpHandler_2, rtmpHandler_3};
+    }
+
+
+    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, 1, frames_skip);
+    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, 1, frames_skip);
+    dsHandler_2 = new dsHandler();
+    dsHandler_3 = new dsHandler();
 
     mCon_not_full = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
     mDsHandlers = {dsHandler_0, dsHandler_1, dsHandler_2, dsHandler_3};
@@ -98,28 +125,6 @@ Dispatch::Dispatch()
 
     mCamPath[0] = path_0;
     mCamPath[1] = path_1;
-
-
-
-    if (rtmp_mode){
-        std::string rtmpPath_0 = labels["RTMP_PATH_0"]; //  rtmp://127.0.0.1:1935/hls/room
-        std::string rtmpPath_1 = labels["RTMP_PATH_1"];
-        std::string rtmpPath_2 = labels["RTMP_PATH_2"]; //  rtmp://127.0.0.1:1935/hls/room
-        std::string rtmpPath_3 = labels["RTMP_PATH_3"];
-
-        rtmpHandler_0 = new rtmpHandler("",rtmpPath_0,out_w,out_h,fps);
-        rtmpHandler_1 = new rtmpHandler("",rtmpPath_1,out_w,out_h,fps);
-        rtmpHandler_2 = new rtmpHandler("",rtmpPath_2,out_w,out_h,fps);
-        rtmpHandler_3 = new rtmpHandler("",rtmpPath_3,out_w,out_h,fps);
-
-        writer_0 = cv::VideoWriter(rtmpPath_0,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
-        writer_1 = cv::VideoWriter(rtmpPath_1,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
-        writer_2 = cv::VideoWriter(rtmpPath_2,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
-        writer_3 = cv::VideoWriter(rtmpPath_3,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
-
-        mRTMPWriter = {writer_0, writer_1, writer_2, writer_3};
-        mRtmpHandlers = {rtmpHandler_0, rtmpHandler_1, rtmpHandler_2, rtmpHandler_3};
-    }
 
     cout << "end Init Dispatch" << endl;
 
@@ -299,21 +304,20 @@ void Dispatch::ConsumeRTMPImage(int mode){
     condition_variable *con_v_wait;
     mutex* rtmpLock;
     cv::VideoWriter writer;
-    rtmpHandler* vRtmpHandler;
+//    rtmpHandler* vRtmpHandler;
 
     lock = mConMutexRTMP[mode];
     queue = &mQueue_rtmp[mode];
     con_v_wait = mCon_rtmp[mode];
     rtmpLock = mRtmpMutex[mode];
     writer = mRTMPWriter[mode];
-    vRtmpHandler = mRtmpHandlers[mode];
+//    vRtmpHandler = mRtmpHandlers[mode];
 
     cout << "ConsumeRTMPImage  start " << endl;
     cout << lock << endl;
     cout << con_v_wait << endl;
     cout << rtmpLock << endl;
     cout << "ConsumeRTMPImage  end " << endl;
-
 
     while (mCamLive[mode]) {
         std::unique_lock<std::mutex> guard(*lock);
@@ -327,8 +331,8 @@ void Dispatch::ConsumeRTMPImage(int mode){
 
         rtmpLock->lock();
 //        TODO 推流逻辑
-        vRtmpHandler->pushRTMP(img);
-//        writer.write(img);
+//        vRtmpHandler->pushRTMP(img);
+        writer.write(img);
         rtmpLock->unlock();
         num++;
         if (num == 10000) num = 0;
