@@ -308,7 +308,7 @@ void CImagePreprocessor::setOutput(float* voDeviceBufferForLearningInput /*= NUL
 
 cudaTextureObject_t CImagePreprocessor::getSrcImg()
 {
-return	m_cuda3DArray->offerTextureObject(false, cudaFilterModePoint, cudaReadModeElementType);
+return	m_cuda3DArray->offerTextureObject2(false, cudaFilterModePoint, cudaReadModeElementType);
 }
 
 CImagePreprocessor::CImagePreprocessor() : m_cuda3DArray(NULL), m_srcImageSizeChanged(true), m_IsMallocInteral(false), m_srcHeight(0), m_srcWidth(0), m_srcChanle(0), m_resizeBuffer(new cv::Mat())

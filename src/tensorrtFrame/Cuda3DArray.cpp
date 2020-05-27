@@ -45,6 +45,17 @@ cudaTextureObject_t CCuda3DArray::offerTextureObject(bool vTexCoordsNormalized, 
 	return m_pTextObject;
 }
 
+cudaTextureObject_t CCuda3DArray::offerTextureObject2(bool vTexCoordsNormalized, cudaTextureFilterMode vFilterMode, cudaTextureReadMode vReadMode, cudaTextureAddressMode vOutOfRangeSolution12D, cudaTextureAddressMode vOutOfRangeSolution3D)
+{
+	if (m_TextFormatFARN.normalizedCoords != vTexCoordsNormalized || m_TextFormatFARN.filterMode != vFilterMode || m_TextFormatFARN.readMode != vReadMode || m_TextFormatFARN.addressMode[0] != vOutOfRangeSolution12D || m_TextFormatFARN.addressMode[1] != vOutOfRangeSolution12D || m_TextFormatFARN.addressMode[2] != vOutOfRangeSolution3D)
+	{
+		if (NULL != m_pTextObject2) exitIfCudaError(cudaDestroyTextureObject(m_pTextObject2));
+		_setTextureParms(vTexCoordsNormalized, vFilterMode, vReadMode, vOutOfRangeSolution12D, vOutOfRangeSolution3D);
+		exitIfCudaError(cudaCreateTextureObject(&m_pTextObject2, &m_DataOfTextSurfaceLA, &m_TextFormatFARN, NULL));
+	}
+	return m_pTextObject2;
+}
+
 void CCuda3DArray::_setTextureParms(bool vTexCoordsNormalized, cudaTextureFilterMode vFilterMode, cudaTextureReadMode vReadMode, cudaTextureAddressMode vOutOfRangeSolution12D, cudaTextureAddressMode vOutOfRangeSolution3D)
 {
 	if (m_Size.depth)

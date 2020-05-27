@@ -16,6 +16,7 @@ public:
 	const cudaExtent& getArraySize(){ return m_Size; }
 	CCuda3DArray(int vWidth, int vHeight, int vDepth, cudaChannelFormatDesc& vElementType, bool vNormalizedCoords = false);
 	cudaTextureObject_t offerTextureObject(bool vTexCoordsNormalized/*=false*/, cudaTextureFilterMode vFilterMode/*=cudaFilterModeLinear*/, cudaTextureReadMode vReadMode/*=cudaReadModeElementType*/, cudaTextureAddressMode vOutOfRangeSolution12D = cudaAddressModeClamp, cudaTextureAddressMode vOutOfRangeSolution3D = cudaAddressModeClamp);
+    cudaTextureObject_t offerTextureObject2(bool vTexCoordsNormalized/*=false*/, cudaTextureFilterMode vFilterMode/*=cudaFilterModeLinear*/, cudaTextureReadMode vReadMode/*=cudaReadModeElementType*/, cudaTextureAddressMode vOutOfRangeSolution12D = cudaAddressModeClamp, cudaTextureAddressMode vOutOfRangeSolution3D = cudaAddressModeClamp);
 
 private:
 	cudaResourceDesc	    m_DataOfTextSurfaceLA;
@@ -23,6 +24,7 @@ private:
 	cudaTextureDesc			m_TextFormatFARN;
 	cudaSurfaceObject_t		m_pSurfaceObject;
 	cudaTextureObject_t     m_pTextObject;
+    cudaTextureObject_t     m_pTextObject2;
 	cudaArray_t				m_pArray3D;
 	cudaExtent				m_Size;
 	void _setTextureParms(bool vTexCoordsNormalized, cudaTextureFilterMode vFilterMode, cudaTextureReadMode vReadMode, cudaTextureAddressMode vOutOfRangeSolution12D, cudaTextureAddressMode vOutOfRangeSolution3D);
