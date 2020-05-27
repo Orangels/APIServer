@@ -95,7 +95,6 @@ Engine_api::Engine_api(std::string pyClass)
             break;
         }
 #endif
-
         PyRun_SimpleString("import sys");
         PyRun_SimpleString("sys.path.append('../pycode')");
         std::cout << pyClass << std::endl;
@@ -131,8 +130,8 @@ Engine_api::Engine_api(std::string pyClass)
 
     if (pClass)
         Py_DECREF(pClass);
-    //if (m_pDict)
-    //       Py_DECREF(m_pDict);
+    if (m_pDict)
+        Py_DECREF(m_pDict);
     if (pModule)
         Py_DECREF(pModule);
     if (pFile)
@@ -168,7 +167,7 @@ Engine_api::~Engine_api()
     printf("EnginePy::~EnginePy() end!\n");
 }
 
-vector<int> Engine_api::get_result(Mat frame, std::string mode)
+vector<int> Engine_api::get_result(Mat frame)
 {
     PyObject *pyResult;
 
@@ -186,7 +185,7 @@ vector<int> Engine_api::get_result(Mat frame, std::string mode)
     PyObject *ArgList1 = PyTuple_New(1);
     mat2np(frame, ArgList1, CArrays);
 
-    std::string pyMethod = "get_result" + mode;
+    std::string pyMethod = "get_result";
     pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"O",ArgList1);
 
     Py_DECREF(ArgList1);

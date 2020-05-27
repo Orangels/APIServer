@@ -5,12 +5,13 @@ imageHandler::imageHandler(){
 
     trEngine = new Engine_Api();
     headTracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
-
+    pyEngineAPI = new Engine_api("engine_api");
 }
 
 imageHandler::~imageHandler(){
     delete trEngine;
     delete headTracker;
+    delete pyEngineAPI;
     std::cout << "del imageHandler" << endl;
 }
 
@@ -34,6 +35,9 @@ void imageHandler::run(cv::Mat ret_img){
         trEngine->get_angles(ret_img,ldmk_boxes,angles);
         trEngine->get_ageGender(ret_img,ldmk_boxes,rects);
     }
+
+    vector<int> vret0;
+    pyEngineAPI->get_result(ret_img.clone());
 
 }
 

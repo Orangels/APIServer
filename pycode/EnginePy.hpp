@@ -21,7 +21,7 @@ public:
     Engine_api();
     Engine_api(std::string pyClass);
     ~Engine_api();
-    vector<int> get_result(Mat frame, std::string mode);
+    vector<int> get_result(Mat frame);
     void test();
 };
 

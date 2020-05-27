@@ -8,6 +8,7 @@
 #include "utils/vis.h"
 #include "config.h"
 #include "engineApi.h"
+#include "EnginePy.hpp"
 
 using namespace cv;
 
@@ -23,6 +24,7 @@ class imageHandler{
     private:
         Engine_Api *trEngine;
         Track *headTracker;
+        Engine_api* pyEngineAPI;
         std::vector<int> hf_boxs;
         std::vector<std::vector<int>> ldmk_boxes;
         std::vector<std::vector<float>>rects;

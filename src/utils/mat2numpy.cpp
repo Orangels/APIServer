@@ -12,10 +12,7 @@ int init_numpy2()
 }
 
 void mat2np(cv::Mat img, PyObject* vArgList, uchar *CArrays){
-
-//    PyObject *ArgList = PyTuple_New(1);
-//    cv::Mat img = cv::imread("/home/user/workspace/xxs/DPH_Server/data/test.png");
-//
+    
     init_numpy2();
     auto sz = img.size();
     int x = sz.width;
@@ -31,20 +28,7 @@ void mat2np(cv::Mat img, PyObject* vArgList, uchar *CArrays){
         iCols *= iRows;
         iRows = 1;
     }
-        CArrays = (uchar*)img.data;
-    //  cost 7ms ????
-//    uchar* p;
-//    int id = -1;
-//    for (int i = 0; i < iRows; i++)
-//    {
-//        // get the pointer to the ith row
-//        p = img.ptr<uchar>(i);
-//        // operates on each pixel
-//        for (int j = 0; j < iCols; j++)
-//        {
-//            CArrays[++id] = p[j];//连续空间
-//        }
-//    }
+    CArrays = (uchar*)img.data;
 
     npy_intp Dims[3] = { y, x, z}; //注意这个维度数据！
     PyObject *PyArray = PyArray_SimpleNewFromData(3, Dims, NPY_UBYTE, CArrays);

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(DHP)
+project(APIServer)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -98,8 +98,8 @@ link_libraries(
         inferLib nvinfer nvcaffeparser  nvinfer_plugin nvparsers ${OpenCV_LIBS} ${CUDA_LIBRARIES} ${trtLibPath}/libcudnn.so ${cppComLib}
 )
 
-add_executable(DPH tools/main.cpp ${DIR_SRC} ${sources}
-#        pycode/EnginePy.cpp
+add_executable(APIServer tools/main.cpp ${DIR_SRC} ${sources}
+        pycode/EnginePy.cpp
 src/utils/mat2numpy.cpp src/utils/vis.cpp src/utils/split.cpp src/utils/match_id.cpp src/utils/trajectory.cpp
 include/structures/structs.h
 src/box_tracking/box_tracking.cpp

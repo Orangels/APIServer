@@ -23,7 +23,6 @@
 #include "config.h"
 #include "Common.h"
 #include "utils/vis.h"
-
 #include "tasks/imageHandler.h"
 
 #include "rapidjson/document.h"
@@ -81,8 +80,8 @@ Dispatch::Dispatch()
         std::string rtmpPath_1 = labels["RTMP_PATH_1"];
         std::string rtmpPath_2 = labels["RTMP_PATH_2"]; //  rtmp://127.0.0.1:1935/hls/room
         std::string rtmpPath_3 = labels["RTMP_PATH_3"];
-//        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! nvv4l2h264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
-        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! omxh264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
+        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! nvv4l2h264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
+//        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! omxh264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
 
 //        rtmpHandler_0 = new rtmpHandler("",rtmpPath_0,out_w,out_h,fps);
 //        rtmpHandler_1 = new rtmpHandler("",rtmpPath_1,out_w,out_h,fps);
@@ -109,15 +108,15 @@ Dispatch::Dispatch()
     dsHandler_2 = new dsHandler();
     dsHandler_3 = new dsHandler();
 
-    mCon_not_full = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
-    mDsHandlers = {dsHandler_0, dsHandler_1, dsHandler_2, dsHandler_3};
+    mCon_not_full  = { &vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3 };
+    mDsHandlers    = {dsHandler_0, dsHandler_1, dsHandler_2, dsHandler_3};
     mCon_not_empty = { &dsHandler_0->con_v_notification, &dsHandler_1->con_v_notification, &dsHandler_2->con_v_notification,
                        &dsHandler_3->con_v_notification};
-    mCon_rtmp = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
-    mConMutexCam = {&dsHandler_0->myMutex, &dsHandler_1->myMutex, &dsHandler_2->myMutex, &dsHandler_3->myMutex};
-    mQueueCam = {&dsHandler_0->imgQueue, &dsHandler_1->imgQueue, &dsHandler_2->imgQueue, &dsHandler_3->imgQueue};
-    mConMutexRTMP = {&vConMutexRTMP_0, &vConMutexRTMP_1, &vConMutexRTMP_2, &vConMutexRTMP_3};
-    mRtmpMutex = {&vRtmpMutex_0, &vRtmpMutex_1, &vRtmpMutex_2, &vRtmpMutex_3};
+    mCon_rtmp      = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
+    mConMutexCam   = {&dsHandler_0->myMutex, &dsHandler_1->myMutex, &dsHandler_2->myMutex, &dsHandler_3->myMutex};
+    mQueueCam      = {&dsHandler_0->imgQueue, &dsHandler_1->imgQueue, &dsHandler_2->imgQueue, &dsHandler_3->imgQueue};
+    mConMutexRTMP  = {&vConMutexRTMP_0, &vConMutexRTMP_1, &vConMutexRTMP_2, &vConMutexRTMP_3};
+    mRtmpMutex     = {&vRtmpMutex_0, &vRtmpMutex_1, &vRtmpMutex_2, &vRtmpMutex_3};
 
 
 
@@ -125,6 +124,20 @@ Dispatch::Dispatch()
 
     mCamPath[0] = path_0;
     mCamPath[1] = path_1;
+
+    Py_Initialize();
+    if (!Py_IsInitialized())
+    {
+        LOG_DEBUG("Py_Initialize error, return\n");
+    }
+
+    PyEval_InitThreads();
+    int nInit = PyEval_ThreadsInitialized();
+    if (nInit)
+    {
+        LOG_DEBUG("PyEval_SaveThread\n");
+        PyEval_SaveThread();
+    }
 
     cout << "end Init Dispatch" << endl;
 
