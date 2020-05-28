@@ -202,7 +202,7 @@ vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vec
     vec2np(trackIDs, ArgList5, 1, CArrays_trackID);
 
     std::string pyMethod = "get_result";
-    pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOOO",ArgList1, ArgList5, ArgList2, ArgList3, ArgList4);
+    pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOOO",ArgList1, ArgList2, ArgList5, ArgList3, ArgList4);
 
     Py_DECREF(ArgList1);
     Py_DECREF(ArgList2);
