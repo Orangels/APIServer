@@ -167,7 +167,8 @@ Engine_api::~Engine_api()
     printf("EnginePy::~EnginePy() end!\n");
 }
 
-vector<int> Engine_api::get_result(Mat frame)
+vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<std::vector<int>> ldmk_boxes,
+        float* kptsArr, float* ageGenderArr)
 {
     PyObject *pyResult;
 
@@ -176,6 +177,8 @@ vector<int> Engine_api::get_result(Mat frame)
     int y = sz.height;
     int z = frame.channels();
     uchar *CArrays = new uchar[x*y*z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
+    int * CArrays_bbox = new int[hf_boxs.size()];
+
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
@@ -185,12 +188,28 @@ vector<int> Engine_api::get_result(Mat frame)
     PyObject *ArgList1 = PyTuple_New(1);
     mat2np(frame, ArgList1, CArrays);
 
+    PyObject *ArgList2 = PyTuple_New(1);
+    vec2np(hf_boxs, ArgList2, 6, CArrays_bbox);
+
+    PyObject *ArgList3 = PyTuple_New(1);
+    vec2np(ArgList3, ldmk_boxes.size(), 285, kptsArr);
+
+    PyObject *ArgList4 = PyTuple_New(1);
+    vec2np(ArgList4, ldmk_boxes.size(), 515, ageGenderArr);
+
     std::string pyMethod = "get_result";
-    pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"O",ArgList1);
+    pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOO",ArgList1, ArgList2, ArgList3, ArgList4);
 
     Py_DECREF(ArgList1);
+    Py_DECREF(ArgList2);
+    Py_DECREF(ArgList3);
+    Py_DECREF(ArgList4);
+    
     delete []CArrays ;
     CArrays =nullptr;
+
+    delete []CArrays_bbox ;
+    CArrays_bbox = nullptr;
 
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;

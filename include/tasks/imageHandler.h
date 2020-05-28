@@ -27,8 +27,11 @@ class imageHandler{
         Engine_api* pyEngineAPI;
         std::vector<int> hf_boxs;
         std::vector<std::vector<int>> ldmk_boxes;
-        std::vector<std::vector<float>>rects;
         std::vector<std::vector<float>>angles;
+        std::vector<std::vector<float>>rects;
+
+        float* mWrects;
+        float* mWangles;
 
 };
 

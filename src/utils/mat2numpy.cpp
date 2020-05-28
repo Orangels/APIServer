@@ -5,14 +5,41 @@
 #include <opencv2/highgui.hpp>
 #include "utils/mat2numpy.h"
 
-
 int init_numpy2()
 {
     import_array();
 }
 
+
+void vec2np(vector<int> arr, PyObject* vArgList, int singleLen, int* CArrays){
+    init_numpy2();
+    int size = arr.size();
+    npy_intp Dims[2] = { size/singleLen, singleLen}; //注意这个维度数据！
+    std::copy(arr.begin(), arr.end(), CArrays);
+    PyObject *PyArray = PyArray_SimpleNewFromData(2, Dims, NPY_INT, CArrays);
+    PyTuple_SetItem(vArgList, 0, PyArray);
+}
+
+
+void vec2np(PyObject* vArgList, int size, int singleLen, float* CArrays){
+    init_numpy2();
+    npy_intp Dims[2] = { size, singleLen}; //注意这个维度数据！
+    PyObject *PyArray = PyArray_SimpleNewFromData(2, Dims, NPY_FLOAT, CArrays);
+    PyTuple_SetItem(vArgList, 0, PyArray);
+}
+
+
+void vec2np(vector<float> arr, PyObject* vArgList, int singleLen, float* CArrays){
+    init_numpy2();
+    int size = arr.size();
+    npy_intp Dims[2] = { size/singleLen, singleLen}; //注意这个维度数据！
+    std::copy(arr.begin(), arr.end(), CArrays);
+    PyObject *PyArray = PyArray_SimpleNewFromData(2, Dims, NPY_FLOAT, CArrays);
+    PyTuple_SetItem(vArgList, 0, PyArray);
+}
+
 void mat2np(cv::Mat img, PyObject* vArgList, uchar *CArrays){
-    
+
     init_numpy2();
     auto sz = img.size();
     int x = sz.width;
@@ -33,19 +60,17 @@ void mat2np(cv::Mat img, PyObject* vArgList, uchar *CArrays){
     npy_intp Dims[3] = { y, x, z}; //注意这个维度数据！
     PyObject *PyArray = PyArray_SimpleNewFromData(3, Dims, NPY_UBYTE, CArrays);
     PyTuple_SetItem(vArgList, 0, PyArray);
-//    delete CArrays ;
-
 }
 
 void list2vector(PyObject* pyResult,std::vector<int> &vret){
 
-        int list_len = PyObject_Size(pyResult);
-        PyObject *pRet = NULL;
-        int ret;//标志位
-        for (int i = 0; i < list_len; i++)
-        {
-            pRet = PyList_GetItem(pyResult, i);//根据下标取出python列表中的元素
-            PyArg_Parse(pRet, "i", &ret);
-            vret.push_back(ret);
-        }
+    int list_len = PyObject_Size(pyResult);
+    PyObject *pRet = NULL;
+    int ret;//标志位
+    for (int i = 0; i < list_len; i++)
+    {
+        pRet = PyList_GetItem(pyResult, i);//根据下标取出python列表中的元素
+        PyArg_Parse(pRet, "i", &ret);
+        vret.push_back(ret);
+    }
 }
