@@ -107,7 +107,7 @@ GstPadProbeReturn osd_sink_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * inf
     if (ds->pic_num == 10000) ds->pic_num = 0;
     std::unique_lock<std::mutex> guard(ds->myMutex);
     if (ds->pic_num % ds->frame_skip == 0){
-        if (ds->imgQueue.size()<50){
+        if (ds->imgQueue.size()<10){
             ds->imgQueue.push(frame);
             ds->con_v_notification.notify_all();
         }

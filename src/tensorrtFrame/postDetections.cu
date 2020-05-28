@@ -9,7 +9,7 @@
 #include <thrust/execution_policy.h>
 
 //__constant__ float g_filterPara[5] = { 0.5f, 4096.f, 2.f };
-__constant__ float g_filterPara[5] = { 0.5f, 2731.f, 2.f };
+__constant__ float g_filterPara[5] = { 0.5f, 1820.f, 2.f };
 __global__ void filtetrBoxesAndSort(float* viopDetections, cudaTextureObject_t vPara, int vHeight, int vWidth)
 {//img_area=800000, min_thresh=0.5, min_abso_area=50 * 50, min_rela_area=0.01, max_aspect_ratio = 2.0
 	float* pio = viopDetections + blockDim.x * 7 * blockIdx.x;

@@ -350,8 +350,8 @@ void Dispatch::ProduceImage(int mode){
     dsHandler* mDsHandler = mDsHandlers[mode];
     mDsHandler->run();
     cout << "produceImage "<< mode << " finish" << endl;
-    mCamLive[cam_id] = false;
-    mDsHandlers[cam_id] = nullptr;
+    mCamLive[mode] = false;
+    mDsHandlers[mode] = nullptr;
 
 }
 

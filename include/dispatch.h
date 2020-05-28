@@ -18,7 +18,7 @@
 #include <Python.h>
 
 #include "dsHandler.h"
-#include "rtmpHandler.h"
+//#include "rtmpHandler.h"
 
 using namespace std;
 class Dispatch
