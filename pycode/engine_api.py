@@ -11,10 +11,11 @@ class ObjectApi():
         self.stop_num = random.randint(5,10)
         print("Init {}".format(self.__class__.__name__))
 
-    def get_result(self, img, bbox, kpts, ageGender):
+    def get_result(self, img, bbox, trackIDs, kpts, ageGender):
         try:
             # print('****')
             # print(bbox[0])
+            # print(trackIDs[0])
             # print(kpts[0].shape)
             # print(ageGender[0].shape)
             # print('****')
