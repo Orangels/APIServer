@@ -81,12 +81,6 @@ Dispatch::Dispatch()
         std::string rtmpPath_2 = labels["RTMP_PATH_2"]; //  rtmp://127.0.0.1:1935/hls/room
         std::string rtmpPath_3 = labels["RTMP_PATH_3"];
         std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! nvv4l2h264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
-//        std::string GSTParams = "appsrc ! videoconvert ! nvvidconv ! omxh264enc ! h264parse ! queue ! flvmux ! rtmpsink location=";
-
-//        rtmpHandler_0 = new rtmpHandler("",rtmpPath_0,out_w,out_h,fps);
-//        rtmpHandler_1 = new rtmpHandler("",rtmpPath_1,out_w,out_h,fps);
-//        rtmpHandler_2 = new rtmpHandler("",rtmpPath_2,out_w,out_h,fps);
-//        rtmpHandler_3 = new rtmpHandler("",rtmpPath_3,out_w,out_h,fps);
 
         rtmpPath_0 =  GSTParams + rtmpPath_0;
         rtmpPath_1 =  GSTParams + rtmpPath_1;
@@ -99,7 +93,6 @@ Dispatch::Dispatch()
 //        writer_3 = cv::VideoWriter(rtmpPath_3,CAP_GSTREAMER,0, fps, cv::Size(out_w, out_h), true);
 
         mRTMPWriter = {writer_0, writer_1, writer_2, writer_3};
-//        mRtmpHandlers = {rtmpHandler_0, rtmpHandler_1, rtmpHandler_2, rtmpHandler_3};
     }
 
 
@@ -317,14 +310,12 @@ void Dispatch::ConsumeRTMPImage(int mode){
     condition_variable *con_v_wait;
     mutex* rtmpLock;
     cv::VideoWriter writer;
-//    rtmpHandler* vRtmpHandler;
 
     lock = mConMutexRTMP[mode];
     queue = &mQueue_rtmp[mode];
     con_v_wait = mCon_rtmp[mode];
     rtmpLock = mRtmpMutex[mode];
     writer = mRTMPWriter[mode];
-//    vRtmpHandler = mRtmpHandlers[mode];
 
     cout << "ConsumeRTMPImage  start " << endl;
     cout << lock << endl;
@@ -344,7 +335,6 @@ void Dispatch::ConsumeRTMPImage(int mode){
 
         rtmpLock->lock();
 //        TODO 推流逻辑
-//        vRtmpHandler->pushRTMP(img);
         writer.write(img);
         rtmpLock->unlock();
         num++;

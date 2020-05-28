@@ -37,7 +37,7 @@ void imageHandler::run(cv::Mat ret_img){
     }
 
     vector<int> vret0;
-    pyEngineAPI->get_result(ret_img.clone());
+//    pyEngineAPI->get_result(ret_img.clone());
 
 }
 
