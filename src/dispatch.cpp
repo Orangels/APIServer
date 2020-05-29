@@ -57,6 +57,9 @@ Dispatch::Dispatch()
     string path_0 = dbLabels["video_path_0"];
     string path_1 = dbLabels["video_path_1"];
 
+    int path_0_h264 = stoi(dbLabels["video_path_0_h264"]) == 1 ?  0 : 1;
+    int path_1_h264 = stoi(dbLabels["video_path_1_h264"]) == 1 ?  0 : 1;
+
     mCamLive = {path_0!="", path_1!="", false, false};
 
     mDsHandlers.resize(4);
@@ -96,8 +99,8 @@ Dispatch::Dispatch()
     }
 
 
-    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, 1, frames_skip);
-    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, 1, frames_skip);
+    dsHandler_0 = new dsHandler (path_0,out_w,out_h,4000000, 0, path_0_h264, frames_skip);
+    dsHandler_1 = new dsHandler (path_1,out_w,out_h,4000000, 1, path_1_h264, frames_skip);
     dsHandler_2 = new dsHandler();
     dsHandler_3 = new dsHandler();
 
