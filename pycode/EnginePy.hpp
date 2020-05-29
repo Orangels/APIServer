@@ -21,8 +21,9 @@ public:
     Engine_api();
     Engine_api(std::string pyClass);
     ~Engine_api();
-    vector<int> get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<std::vector<int>> ldmk_boxes,
-                           float* kptsArr, float* ageGenderArr);
+    void get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs,
+            std::vector<std::vector<int>> ldmk_boxes, std::vector<float> kptsArr, std::vector<float> ageGenderArr);
+
     void test();
 };
 

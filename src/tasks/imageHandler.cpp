@@ -34,13 +34,12 @@ void imageHandler::run(cv::Mat ret_img){
     if (ldmk_boxes.size()>0){
 //        trEngine->get_angles(ret_img,ldmk_boxes,angles);
 //        trEngine->get_ageGender(ret_img,ldmk_boxes,rects);
-
-        trEngine->get_angles(ret_img,ldmk_boxes,mWangles);
-        trEngine->get_ageGender(ret_img,ldmk_boxes,mWrects);
+        trEngine->get_angles(ret_img,ldmk_boxes,vWangles);
+        trEngine->get_ageGender(ret_img,ldmk_boxes,vWrects);
     }
 
     vector<int> vret0;
-    pyEngineAPI->get_result(ret_img.clone(), hf_boxs, headTracker->tracking_result, ldmk_boxes, mWangles, mWrects);
+    pyEngineAPI->get_result(ret_img.clone(), hf_boxs, headTracker->tracking_result, ldmk_boxes, vWangles, vWrects);
 
 }
 

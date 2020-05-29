@@ -14,24 +14,26 @@ class ObjectApi():
 
     def get_result(self, img, bbox, trackIDs, kpts, ageGender):
         try:
-            print('****')
-            print(bbox[0])
-            print(trackIDs[0])
+            # print('****')
+            # print(bbox[0])
+            # print(trackIDs[0])
             # print(kpts[0].shape)
-            # print(ageGender[0].shape)
-            print('****')
+            # print(ageGender[0])
+            # print('****')
             self.num += 1
             ret = []
             frame = img[0]
 
             # if len(kpts[0]) > 0 and self.serialize:
-            #     np.save('./npy/bbox.npy', bbox[0])
-            #     np.save('./npy/kpts.npy', kpts[0])
-            #     np.save('./npy/trackIDs.npy', trackIDs[0])
-            #     np.save('./npy/ageGender.npy', ageGender[0])
-            #     cv2.imwrite("./npy/npy_img_{}.jpg".format(self.stop_num), frame)
-            #     self.serialize = False
-            #     print('save npy')
+            #     print(ageGender[0])
+                # print(kpts[0])
+                # np.save('./npy/bbox.npy', bbox[0])
+                # np.save('./npy/kpts.npy', kpts[0])
+                # np.save('./npy/trackIDs.npy', trackIDs[0])
+                # np.save('./npy/ageGender.npy', ageGender[0])
+                # cv2.imwrite("./npy/npy_img_{}.jpg".format(self.stop_num), frame)
+                # self.serialize = False
+                # print('save npy')
             #
             # if self.num == self.stop_num:
             #     print('write img')

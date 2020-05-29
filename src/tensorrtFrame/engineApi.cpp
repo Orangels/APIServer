@@ -92,6 +92,22 @@ void Engine_Api::get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects
 	}
 }
 
+void Engine_Api::get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<float>& angles)
+{
+    cv::Mat img = image.clone();
+    img.convertTo(img, CV_32FC3);
+    int model_batch = 8;
+    int num_face = rects.size();
+    std::vector<int> data;
+    for(auto& rect : rects){
+        data.insert(data.end(), rect.begin(),rect.end());
+    }
+    std::vector<float> r(num_face * (62 + 219 + 4));
+
+    keyPointInference(num_face, data.data(), r.data());
+    angles = r;
+}
+
 void Engine_Api::get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, void * angles)
 {
 	cv::Mat img = image.clone();
@@ -112,8 +128,8 @@ void Engine_Api::get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects
 void Engine_Api::get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos)
 {
     int vw = 112, vh = 112;
-	std::vector<float> r(64*56*56);//64, 56, 56
     int num_face = rects.size();
+    std::vector<float> r(num_face*515);//64, 56, 56
 	std::vector<int> data;
 	for(auto& rect : rects){
 		data.insert(data.end(), rect.begin(), rect.end());
@@ -130,11 +146,25 @@ void Engine_Api::get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& re
     }
 }
 
+void Engine_Api::get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<float>& infos)
+{
+    int vw = 112, vh = 112;
+    int num_face = rects.size();
+    std::vector<float> r(num_face*515);//64, 56, 56
+    std::vector<int> data;
+    for(auto& rect : rects){
+        data.insert(data.end(), rect.begin(), rect.end());
+    }
+
+    ageGenderInference(num_face, data.data(), r.data());
+    infos = r;
+}
+
 void Engine_Api::get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, void * infos)
 {
     int vw = 112, vh = 112;
-	std::vector<float> r(64*56*56);//64, 56, 56
     int num_face = rects.size();
+    std::vector<float> r(num_face*515);//64, 56, 56
 	std::vector<int> data;
 	for(auto& rect : rects){
 		data.insert(data.end(), rect.begin(), rect.end());

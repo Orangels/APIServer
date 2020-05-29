@@ -15,8 +15,10 @@ public:
     void detect_headface(cv::Mat &image, std::vector<int>& hf_boxs);
     void detect_headface(cv::Mat &image, void * hf_boxs);
     void get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& angles);
+    void get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<float>& angles);
     void get_angles(cv::Mat &image, std::vector<std::vector<int>>& rects, void * angles);
     void get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<std::vector<float>>& infos);
+    void get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, std::vector<float>& infos);
     void get_ageGender(cv::Mat &image, std::vector<std::vector<int>>& rects, void * infos);
 private:
     CConfiger* m_pconfiger;

@@ -26,6 +26,8 @@ class imageHandler{
         Track *headTracker;
         Engine_api* pyEngineAPI;
         std::vector<int> hf_boxs;
+        std::vector<float> vWangles;
+        std::vector<float> vWrects;
         std::vector<std::vector<int>> ldmk_boxes;
         std::vector<std::vector<float>>angles;
         std::vector<std::vector<float>>rects;

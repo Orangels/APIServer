@@ -167,8 +167,8 @@ Engine_api::~Engine_api()
     printf("EnginePy::~EnginePy() end!\n");
 }
 
-vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<std::vector<int>> ldmk_boxes,
-        float* kptsArr, float* ageGenderArr)
+void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<std::vector<int>> ldmk_boxes,
+                                   std::vector<float> kptsArr, std::vector<float> ageGenderArr)
 {
     PyObject *pyResult;
 
@@ -179,6 +179,8 @@ vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vec
     uchar *CArrays = new uchar[x*y*z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
     int * CArrays_bbox = new int[hf_boxs.size()];
     int * CArrays_trackID = new int[trackIDs.size()];
+    float * CArrays_kpts = new float[kptsArr.size()];
+    float * CArrays_age = new float[ageGenderArr.size()];
 
 
     PyGILState_STATE gstate;
@@ -193,16 +195,16 @@ vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vec
     vec2np(hf_boxs, ArgList2, 6, CArrays_bbox);
 
     PyObject *ArgList3 = PyTuple_New(1);
-    vec2np(ArgList3, ldmk_boxes.size(), 285, kptsArr);
+    vec2np(kptsArr, ArgList3, 285, CArrays_kpts);
 
     PyObject *ArgList4 = PyTuple_New(1);
-    vec2np(ArgList4, ldmk_boxes.size(), 515, ageGenderArr);
+    vec2np(ageGenderArr, ArgList4, 515, CArrays_age);
 
     PyObject *ArgList5 = PyTuple_New(1);
     vec2np(trackIDs, ArgList5, 1, CArrays_trackID);
 
     std::string pyMethod = "get_result";
-    pyResult = PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOOO",ArgList1, ArgList2, ArgList5, ArgList3, ArgList4);
+    PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOOO",ArgList1, ArgList2, ArgList5, ArgList3, ArgList4);
 
     Py_DECREF(ArgList1);
     Py_DECREF(ArgList2);
@@ -211,7 +213,7 @@ vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vec
     Py_DECREF(ArgList5);
 
     delete []CArrays ;
-    CArrays =nullptr;
+    CArrays = nullptr;
 
     delete []CArrays_bbox ;
     CArrays_bbox = nullptr;
@@ -219,14 +221,15 @@ vector<int> Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vec
     delete []CArrays_trackID ;
     CArrays_trackID = nullptr;
 
+    delete []CArrays_kpts ;
+    CArrays_kpts = nullptr;
+
+    delete []CArrays_age ;
+    CArrays_age = nullptr;
+
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;
     PyGILState_Release(gstate);
-
-    vector<int> vret0;
-    list2vector(pyResult,vret0);
-
-    return vret0;
 }
 
 void Engine_api::test(){
