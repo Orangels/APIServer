@@ -6,11 +6,11 @@ import traceback
 import random
 
 class ObjectApi():
-    def __init__(self, cfg_file='detection.yaml'):
+    def __init__(self, camId=0):
         self.num = 0
         self.stop_num = random.randint(5,10)
         self.serialize = True
-        print("Init {}".format(self.__class__.__name__))
+        print("Init {} -- {}".format(self.__class__.__name__, camId))
 
     def get_result(self, img, bbox, trackIDs, kpts, ageGender):
         try:

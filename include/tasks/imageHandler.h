@@ -15,6 +15,7 @@ using namespace cv;
 class imageHandler{
     public:
         imageHandler();
+        imageHandler(int camId);
         ~imageHandler();
         void run(cv::Mat ret_img);
         void vis(cv::Mat& ret_img);

@@ -74,11 +74,13 @@ Engine_api::Engine_api()
 }
 
 
-Engine_api::Engine_api(std::string pyClass)
+Engine_api::Engine_api(std::string pyClass, int camId)
 {
     PyObject* pFile = NULL;
     PyObject* pModule = NULL;
     PyObject* pClass = NULL;
+    PyObject* arglist;
+    arglist = Py_BuildValue("(i)", camId);
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
@@ -120,7 +122,7 @@ Engine_api::Engine_api(std::string pyClass)
             break;
         }
 
-        m_pHandle = PyObject_CallObject(pClass, nullptr);
+        m_pHandle = PyObject_CallObject(pClass, arglist);
         if (!m_pHandle)
         {
             printf("PyInstance_New ObjectApi failed!\n");
@@ -136,6 +138,8 @@ Engine_api::Engine_api(std::string pyClass)
         Py_DECREF(pModule);
     if (pFile)
         Py_DECREF(pFile);
+    if (arglist)
+        Py_DECREF(arglist);
 
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;

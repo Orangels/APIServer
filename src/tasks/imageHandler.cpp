@@ -1,11 +1,15 @@
 #include "tasks/imageHandler.h"
 
 imageHandler::imageHandler(){
+
+}
+
+imageHandler::imageHandler(int camId){
     Cconfig labels = Cconfig("../cfg/process.ini");
 
     trEngine = new Engine_Api();
     headTracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
-    pyEngineAPI = new Engine_api("engine_api");
+    pyEngineAPI = new Engine_api("engine_api", camId);
 }
 
 imageHandler::~imageHandler(){

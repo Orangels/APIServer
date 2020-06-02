@@ -375,7 +375,7 @@ void Dispatch::ConsumeImage(int mode){
     cv::Mat* rtmp_img;
     cv::Mat ret_img;
 
-    imageHandler vImageHandler;
+    imageHandler vImageHandler(mode);
 
     lock = mConMutexCam[mode];
     queue = mQueueCam[mode];
