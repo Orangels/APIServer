@@ -12,17 +12,20 @@
 using namespace std;
 using namespace cv;
 
-class Engine_api
-{
+class Engine_api {
 public:
-    PyObject* m_pDict = NULL;
-    PyObject* m_pHandle = NULL;
+    PyObject *m_pDict   = NULL;
+    PyObject *m_pHandle = NULL;
 public:
     Engine_api();
+
     Engine_api(std::string pyClass, int camId);
+
     ~Engine_api();
-    void get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs,
-            std::vector<std::vector<int>> ldmk_boxes, std::vector<float> kptsArr, std::vector<float> ageGenderArr);
+
+    void get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
+                    std::vector<std::vector<int>> ldmk_boxes, std::vector<float> kptsArr,
+                    std::vector<float> ageGenderArr);
 
     void test();
 };

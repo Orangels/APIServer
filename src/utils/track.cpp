@@ -10,6 +10,9 @@ Track::Track(int head_track_mistimes, int w, int h) {
     tracker = new BoxTracker(4.0, 1.0, head_track_mistimes);
     img_w = w;
     img_h = h;
+    detection_rects.resize(1);
+    tracking_result.resize(1);
+    delete_tracking_id.resize(1);
 }
 
 Track::~Track() = default;

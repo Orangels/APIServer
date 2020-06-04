@@ -12,13 +12,14 @@ class ObjectApi():
         self.serialize = True
         print("Init {} -- {}".format(self.__class__.__name__, camId))
 
-    def get_result(self, img, bbox, trackIDs, kpts, ageGender):
+    def get_result(self, img, bbox, trackIDs, deleteIDs, kpts, ageGender):
         try:
             # print('****')
             # print(bbox[0])
             # print(trackIDs[0])
             # print(kpts[0].shape)
             # print(ageGender[0])
+            # print(deleteIDs[0])
             # print('****')
             self.num += 1
             ret = []

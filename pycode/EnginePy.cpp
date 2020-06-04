@@ -2,19 +2,17 @@
 #include "utils/mat2numpy.h"
 #include <iostream>
 
-Engine_api::Engine_api()
-{
-    PyObject* pFile = NULL;
-    PyObject* pModule = NULL;
-    PyObject* pClass = NULL;
+Engine_api::Engine_api(){
+    PyObject *pFile   = NULL;
+    PyObject *pModule = NULL;
+    PyObject *pClass  = NULL;
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
     Py_BEGIN_ALLOW_THREADS;
     Py_BLOCK_THREADS;
 
-    do
-    {
+    do {
 #if 0
         Py_Initialize();
         if (!Py_IsInitialized())
@@ -27,31 +25,27 @@ Engine_api::Engine_api()
         PyRun_SimpleString("import sys");
         PyRun_SimpleString("sys.path.append('../pycode')");
 
-        pFile = PyUnicode_FromString("tracker_api");
+        pFile   = PyUnicode_FromString("tracker_api");
         pModule = PyImport_Import(pFile);
-        if (!pModule)
-        {
+        if (!pModule) {
             printf("PyImport_Import tracker_api.py failed!\n");
             break;
         }
 
         m_pDict = PyModule_GetDict(pModule);
-        if (!m_pDict)
-        {
+        if (!m_pDict) {
             printf("PyModule_GetDict tracker_api.py failed!\n");
             break;
         }
 
         pClass = PyDict_GetItemString(m_pDict, "ObjectApi");
-        if (!pClass || !PyCallable_Check(pClass))
-        {
+        if (!pClass || !PyCallable_Check(pClass)) {
             printf("PyDict_GetItemString tracker_api failed!\n");
             break;
         }
 
         m_pHandle = PyObject_CallObject(pClass, nullptr);
-        if (!m_pHandle)
-        {
+        if (!m_pHandle) {
             printf("PyInstance_New ObjectApi failed!\n");
             break;
         }
@@ -74,12 +68,11 @@ Engine_api::Engine_api()
 }
 
 
-Engine_api::Engine_api(std::string pyClass, int camId)
-{
-    PyObject* pFile = NULL;
-    PyObject* pModule = NULL;
-    PyObject* pClass = NULL;
-    PyObject* arglist;
+Engine_api::Engine_api(std::string pyClass, int camId){
+    PyObject *pFile   = NULL;
+    PyObject *pModule = NULL;
+    PyObject *pClass  = NULL;
+    PyObject *arglist;
     arglist = Py_BuildValue("(i)", camId);
 
     PyGILState_STATE gstate;
@@ -87,8 +80,7 @@ Engine_api::Engine_api(std::string pyClass, int camId)
     Py_BEGIN_ALLOW_THREADS;
     Py_BLOCK_THREADS;
 
-    do
-    {
+    do {
 #if 0
         Py_Initialize();
         if (!Py_IsInitialized())
@@ -100,31 +92,27 @@ Engine_api::Engine_api(std::string pyClass, int camId)
         PyRun_SimpleString("import sys");
         PyRun_SimpleString("sys.path.append('../pycode')");
         std::cout << pyClass << std::endl;
-        pFile = PyUnicode_FromString(pyClass.c_str());
+        pFile   = PyUnicode_FromString(pyClass.c_str());
         pModule = PyImport_Import(pFile);
-        if (!pModule)
-        {
+        if (!pModule) {
             printf("PyImport_Import tracker_api.py failed!\n");
             break;
         }
 
         m_pDict = PyModule_GetDict(pModule);
-        if (!m_pDict)
-        {
+        if (!m_pDict) {
             printf("PyModule_GetDict tracker_api.py failed!\n");
             break;
         }
 
         pClass = PyDict_GetItemString(m_pDict, "ObjectApi");
-        if (!pClass || !PyCallable_Check(pClass))
-        {
+        if (!pClass || !PyCallable_Check(pClass)) {
             printf("PyDict_GetItemString tracker_api failed!\n");
             break;
         }
 
         m_pHandle = PyObject_CallObject(pClass, arglist);
-        if (!m_pHandle)
-        {
+        if (!m_pHandle) {
             printf("PyInstance_New ObjectApi failed!\n");
             break;
         }
@@ -149,8 +137,7 @@ Engine_api::Engine_api(std::string pyClass, int camId)
 }
 
 
-Engine_api::~Engine_api()
-{
+Engine_api::~Engine_api(){
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
     Py_BEGIN_ALLOW_THREADS;
@@ -171,20 +158,21 @@ Engine_api::~Engine_api()
     printf("EnginePy::~EnginePy() end!\n");
 }
 
-void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<std::vector<int>> ldmk_boxes,
-                                   std::vector<float> kptsArr, std::vector<float> ageGenderArr)
-{
+void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
+                            std::vector<std::vector<int>> ldmk_boxes,
+                            std::vector<float> kptsArr, std::vector<float> ageGenderArr){
     PyObject *pyResult;
 
-    auto sz = frame.size();
-    int x = sz.width;
-    int y = sz.height;
-    int z = frame.channels();
-    uchar *CArrays = new uchar[x*y*z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
-    int * CArrays_bbox = new int[hf_boxs.size()];
-    int * CArrays_trackID = new int[trackIDs.size()];
-    float * CArrays_kpts = new float[kptsArr.size()];
-    float * CArrays_age = new float[ageGenderArr.size()];
+    auto  sz                = frame.size();
+    int   x                 = sz.width;
+    int   y                 = sz.height;
+    int   z                 = frame.channels();
+    uchar *CArrays          = new uchar[x * y * z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
+    int   *CArrays_bbox     = new int[hf_boxs.size()];
+    int   *CArrays_trackID  = new int[trackIDs.size()];
+    int   *CArrays_deleteID = new int[deleteIDs.size()];
+    float *CArrays_kpts     = new float[kptsArr.size()];
+    float *CArrays_age      = new float[ageGenderArr.size()];
 
 
     PyGILState_STATE gstate;
@@ -192,43 +180,48 @@ void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int
     Py_BEGIN_ALLOW_THREADS;
     Py_BLOCK_THREADS;
 
-    PyObject *ArgList1 = PyTuple_New(1);
-    mat2np(frame, ArgList1, CArrays);
+    PyObject *ArgListFrame = PyTuple_New(1);
+    mat2np(frame, ArgListFrame, CArrays);
 
-    PyObject *ArgList2 = PyTuple_New(1);
-    vec2np(hf_boxs, ArgList2, 6, CArrays_bbox);
+    PyObject *ArgListBBox = PyTuple_New(1);
+    vec2np(hf_boxs, ArgListBBox, 6, CArrays_bbox);
 
-    PyObject *ArgList3 = PyTuple_New(1);
-    vec2np(kptsArr, ArgList3, 285, CArrays_kpts);
+    PyObject *ArgListKpts = PyTuple_New(1);
+    vec2np(kptsArr, ArgListKpts, 285, CArrays_kpts);
 
-    PyObject *ArgList4 = PyTuple_New(1);
-    vec2np(ageGenderArr, ArgList4, 515, CArrays_age);
+    PyObject *ArgListAge = PyTuple_New(1);
+    vec2np(ageGenderArr, ArgListAge, 515, CArrays_age);
 
-    PyObject *ArgList5 = PyTuple_New(1);
-    vec2np(trackIDs, ArgList5, 1, CArrays_trackID);
+    PyObject *ArgListTrackID = PyTuple_New(1);
+    vec2np(trackIDs, ArgListTrackID, 1, CArrays_trackID);
+
+    PyObject *ArgListDeleteID = PyTuple_New(1);
+    vec2np(trackIDs, ArgListDeleteID, 1, CArrays_deleteID);
 
     std::string pyMethod = "get_result";
-    PyObject_CallMethod(m_pHandle,pyMethod.c_str(),"OOOOO",ArgList1, ArgList2, ArgList5, ArgList3, ArgList4);
+    PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOO", ArgListFrame, ArgListBBox, ArgListTrackID,
+                        ArgListDeleteID, ArgListKpts, ArgListAge);
 
-    Py_DECREF(ArgList1);
-    Py_DECREF(ArgList2);
-    Py_DECREF(ArgList3);
-    Py_DECREF(ArgList4);
-    Py_DECREF(ArgList5);
+    Py_DECREF(ArgListFrame);
+    Py_DECREF(ArgListBBox);
+    Py_DECREF(ArgListKpts);
+    Py_DECREF(ArgListAge);
+    Py_DECREF(ArgListTrackID);
+    Py_DECREF(ArgListDeleteID);
 
-    delete []CArrays ;
+    delete[]CArrays;
     CArrays = nullptr;
 
-    delete []CArrays_bbox ;
+    delete[]CArrays_bbox;
     CArrays_bbox = nullptr;
 
-    delete []CArrays_trackID ;
+    delete[]CArrays_trackID;
     CArrays_trackID = nullptr;
 
-    delete []CArrays_kpts ;
+    delete[]CArrays_kpts;
     CArrays_kpts = nullptr;
 
-    delete []CArrays_age ;
+    delete[]CArrays_age;
     CArrays_age = nullptr;
 
     Py_UNBLOCK_THREADS;
@@ -242,10 +235,9 @@ void Engine_api::test(){
     Py_BEGIN_ALLOW_THREADS;
     Py_BLOCK_THREADS;
 
-    do
-    {
+    do {
         PyObject_CallMethod(m_pHandle, "test", NULL, NULL);
-    } while(0);
+    } while (0);
 
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;

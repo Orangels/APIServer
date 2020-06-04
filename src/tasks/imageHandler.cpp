@@ -43,7 +43,7 @@ void imageHandler::run(cv::Mat ret_img){
     }
 
     vector<int> vret0;
-    pyEngineAPI->get_result(ret_img.clone(), hf_boxs, headTracker->tracking_result, ldmk_boxes, vWangles, vWrects);
+    pyEngineAPI->get_result(ret_img.clone(), hf_boxs, headTracker->tracking_result, headTracker->delete_tracking_id, ldmk_boxes, vWangles, vWrects);
 
 }
 
