@@ -158,7 +158,7 @@ Engine_api::~Engine_api(){
     printf("EnginePy::~EnginePy() end!\n");
 }
 
-void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
+void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
                             std::vector<std::vector<int>> ldmk_boxes,
                             std::vector<float> kptsArr, std::vector<float> ageGenderArr){
     PyObject *pyResult;
@@ -198,9 +198,12 @@ void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int
     PyObject *ArgListDeleteID = PyTuple_New(1);
     vec2np(trackIDs, ArgListDeleteID, 1, CArrays_deleteID);
 
-    std::string pyMethod = "get_result";
-    PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOO", ArgListFrame, ArgListBBox, ArgListTrackID,
-                        ArgListDeleteID, ArgListKpts, ArgListAge);
+    std::string pyMethod   = "get_result";
+    PyObject    *pRetValue = PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOO", ArgListFrame, ArgListBBox,
+                                                 ArgListTrackID,
+                                                 ArgListDeleteID, ArgListKpts, ArgListAge);
+
+    frame = np2mat(pRetValue);
 
     Py_DECREF(ArgListFrame);
     Py_DECREF(ArgListBBox);
@@ -208,6 +211,7 @@ void Engine_api::get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int
     Py_DECREF(ArgListAge);
     Py_DECREF(ArgListTrackID);
     Py_DECREF(ArgListDeleteID);
+    Py_DECREF(pRetValue);
 
     delete[]CArrays;
     CArrays = nullptr;

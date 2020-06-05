@@ -14,3 +14,5 @@ void vec2np(PyObject* vArgList, int size, int singleLen, float* CArrays);
 
 
 void list2vector(PyObject* pyResult,std::vector<int> &vret);
+
+cv::Mat np2mat(PyObject* pyResult);

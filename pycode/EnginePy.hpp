@@ -23,7 +23,7 @@ public:
 
     ~Engine_api();
 
-    void get_result(Mat frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
+    void get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<int> trackIDs, std::vector<int> deleteIDs,
                     std::vector<std::vector<int>> ldmk_boxes, std::vector<float> kptsArr,
                     std::vector<float> ageGenderArr);
 

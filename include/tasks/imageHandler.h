@@ -17,7 +17,7 @@ class imageHandler{
         imageHandler();
         imageHandler(int camId);
         ~imageHandler();
-        void run(cv::Mat ret_img);
+        void run(cv::Mat& ret_img);
         void vis(cv::Mat& ret_img);
 
         cv::Mat frame;

@@ -408,7 +408,7 @@ void Dispatch::ConsumeImage(int mode){
         ret_img = frame.clone();
         if (stoi(labels["inference_switch"])){
             vImageHandler.run(ret_img);
-            vImageHandler.vis(ret_img);
+//            vImageHandler.vis(ret_img);
         }
 
         if (rtmp_mode == 1) {

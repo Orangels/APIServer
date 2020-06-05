@@ -39,7 +39,9 @@ class ObjectApi():
             # if self.num == self.stop_num:
             #     print('write img')
             #     cv2.imwrite("./imgs/pyimg_{}.jpg".format(self.stop_num), frame)
-            return ret
+            # frame=cv2.rectangle(frame, (0, 0), (100, 100), (0,255,0), 2)
+
+            return frame
         except Exception as e:
             print('***********')
             print(e)
