@@ -1,0 +1,23 @@
+# CAMERA_TYPE[type] : 0 fish, 1 gun, 2 ball
+CAM:
+  -
+    MAC: 54BF6474C2F7
+    QLEN: 10
+    FRAMES_SKIP: 2
+    FPS: 10
+    RTMP_MODE: 1
+    RTMP_INSERT_MODE: 1
+    RTMP_PATH:
+      - rtmp://127.0.0.1:1935/hls/000
+    VIDEO_PATH: rtsp://172.16.104.173:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
+    FORMAT_H264: false
+    CAM_CACHE: false
+    CAMERA_TYPE:
+      TYPE: 1
+      FISH_MODE: -1
+      RTMP_SIZE:
+        WIDTH: 1280
+        HEIGHT: 720
+algorithm:
+  tracker:
+    los_number: 20

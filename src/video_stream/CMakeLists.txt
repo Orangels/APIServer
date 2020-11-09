@@ -58,6 +58,7 @@ target_link_libraries(videoStream ${OpenCV_LIBS}
         ${SYS_LIB}/libpcre.so.3
         ${OpenCV_LIBS}
         cudart
+        yaml-cpp
 #        /usr/local/ffmpeg/lib/libavcodec.so
 #        /usr/local/ffmpeg/lib/libavdevice.so
 #        /usr/local/ffmpeg/lib/libavfilter.so
