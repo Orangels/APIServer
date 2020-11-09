@@ -14,13 +14,14 @@ class ObjectApi():
 
     def get_result(self, img, bbox, trackIDs, deleteIDs, kpts, ageGender):
         try:
-            # print('****')
-            # print(bbox[0])
+            # print('**py**')
+            print(bbox[0])
             # print(trackIDs[0])
             # print(kpts[0].shape)
             # print(ageGender[0])
+            # print("delete ids : ")
             # print(deleteIDs[0])
-            # print('****')
+            # print('**py**')
             self.num += 1
             ret = []
             frame = img[0]

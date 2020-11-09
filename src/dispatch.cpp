@@ -407,8 +407,9 @@ void Dispatch::ConsumeImage(int mode){
         //        TODO 业务逻辑
         ret_img = frame.clone();
         if (stoi(labels["inference_switch"])){
+            cout << "mode -- " << mode << endl;
             vImageHandler.run(ret_img);
-//            vImageHandler.vis(ret_img);
+            vImageHandler.vis(ret_img);
         }
 
         if (rtmp_mode == 1) {

@@ -44,7 +44,12 @@ void Engine_Api::detect_headface(cv::Mat &image, std::vector<int>& hf_boxs)
 
     for (int j = 0; j < numDetection; ++j) {
         for(int i =0; i< 6;i++){
-            hf_boxs.push_back(int(box[i]));
+//            confidence * 100 to int
+            if (i == 4){
+                hf_boxs.push_back(int(box[i]*100));
+            }else{
+                hf_boxs.push_back(int(box[i]));
+            }
         }
 		box += 6;
 	}

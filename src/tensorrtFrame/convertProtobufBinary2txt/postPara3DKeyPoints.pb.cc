@@ -74,7 +74,7 @@ const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_postPa
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_postPara3DKeyPoints_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_postPara3DKeyPoints_2eproto)), true);
+static bool dynamic_init_dummy_postPara3DKeyPoints_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_postPara3DKeyPoints_2eproto), true);
 
 // ===================================================================
 
