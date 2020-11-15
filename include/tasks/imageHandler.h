@@ -6,7 +6,7 @@
 #include <vector>
 #include "utils/track.h"
 #include "utils/vis.h"
-#include "config.h"
+//#include "config.h"
 #include "engineApi.h"
 #include "EnginePy.hpp"
 
@@ -19,9 +19,9 @@ class imageHandler{
         ~imageHandler();
         void run(cv::Mat& ret_img);
         void vis(cv::Mat& ret_img);
+        void updateLosNum(int num);
 
         cv::Mat frame;
-
     private:
         Engine_Api *trEngine;
         Track *headTracker;

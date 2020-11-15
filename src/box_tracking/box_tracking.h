@@ -51,7 +51,7 @@ namespace boxTracking{
         vector<int> tracking_Frame_Hungarian(vector<Rect> detection_rects,int img_w_,int img_h_);
 
 
-
+        int max_mismatch_times;
 
     private:
         vector<vector<double> > cal_costMatrix(vector<Rect> detection_rects);
@@ -67,7 +67,7 @@ namespace boxTracking{
         float cost_th;
         float max_cost;
         vector<tracker_info> tracking_infos;
-        int max_mismatch_times;
+//        int max_mismatch_times;
         float near_boundary_th;
         float iou_cost_weight;
         float distance_cost_weight;

@@ -18,15 +18,19 @@ imageHandler::imageHandler(int camId){
     auto conf = config_A->getConfig();
 
     trEngine    = new Engine_Api();
-    headTracker = new Track(conf["CAM"][camId]["ALGORITHM"]["LOS_NUMBER"].as<int>(), 1280, 720);
+    headTracker = new Track(conf["CAM"][camId]["ALGORITHM"]["TRACKER"]["LOS_NUMBER"].as<int>(), 1280, 720);
     pyEngineAPI = new Engine_api("engine_api", camId);
 }
 
 imageHandler::~imageHandler(){
-    delete trEngine;
+//    delete trEngine;
     delete headTracker;
     delete pyEngineAPI;
     std::cout << "del imageHandler" << endl;
+}
+
+void imageHandler::updateLosNum(int num){
+    headTracker->tracker->max_mismatch_times = num;
 }
 
 void imageHandler::run(cv::Mat& ret_img){

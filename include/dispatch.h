@@ -13,7 +13,7 @@
 #include <thread>
 #include <vector>
 #include <condition_variable>
-#include "config.h"
+//#include "config.h"
 
 #include <Python.h>
 
@@ -63,8 +63,7 @@ public:
     
 
 private:
-    Cconfig labels   = Cconfig("../cfg/process.ini");
-    Cconfig dbLabels = Cconfig("/srv/media_info.txt");
+
     int     frame_count;
 
     int frames_skip;
