@@ -60,6 +60,7 @@ public:
     vector<imageHandler *>       mImageHandlers;
     vector<cv::Mat>              mRtmpImg;
 
+    
 
 private:
     Cconfig labels   = Cconfig("../cfg/process.ini");
