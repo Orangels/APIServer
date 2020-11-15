@@ -18,6 +18,9 @@
 #include <Python.h>
 
 #include "dsHandler.h"
+#include "singleton.h"
+#include "config_yaml.h"
+
 //#include "rtmpHandler.h"
 
 using namespace std;
@@ -76,6 +79,6 @@ private:
         dsHandler *dsHandler_0, *dsHandler_1, *dsHandler_2, *dsHandler_3;
 //        rtmpHandler *rtmpHandler_0, *rtmpHandler_1, *rtmpHandler_2, *rtmpHandler_3;
 
-
+    yamlConfig* config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
 };
 #endif

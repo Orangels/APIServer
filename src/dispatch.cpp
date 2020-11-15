@@ -46,6 +46,22 @@ int64_t getCurrentTime()
 Dispatch::Dispatch()
 {
     cout << "start Init Dispatch" << endl;
+
+    auto conf = config_A->getConfig();
+
+//    yaml Config
+    if (conf["CAM"].size() > 0){
+        mQueueLen = conf["CAM"][0]["QLEN"].as<int>();
+        frames_skip = conf["CAM"][0]["FRAMES_SKIP"].as<int>();
+        rtmp_mode = conf["CAM"][0]["RTMP_MODE"].as<int>();
+
+        int fps = conf["CAM"][0]["FPS"].as<int>();
+        int out_w = conf["CAM"][0]["CAMERA_TYPE"]["RTMP_SIZE"]["WIDTH"].as<int>();
+        int out_h = conf["CAM"][0]["CAMERA_TYPE"]["RTMP_SIZE"]["HEIGHT"].as<int>();
+
+        string video_path = conf["CAM"][0]["VIDEO_PATH"].as<string>();
+    }
+
     mQueueLen = stoi(labels["QLEN"]);
     frames_skip = stoi(labels["FRAMES_SKIP"]); //2
     rtmp_mode = stoi(labels["RTMP_MODE"]); //0
