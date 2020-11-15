@@ -1,23 +1,51 @@
-# CAMERA_TYPE[type] : 0 fish, 1 gun, 2 ball
+ALGORITHM:
+  TRACKER:
+    LOS_NUMBER: 15
+SERVER:
+  SPORT: 1900
+  SQUEUE: 20
 CAM:
-  -
-    MAC: 54BF6474C2F7
-    QLEN: 10
-    FRAMES_SKIP: 2
-    FPS: 10
-    RTMP_MODE: 1
-    RTMP_INSERT_MODE: 1
-    RTMP_PATH:
-      - rtmp://127.0.0.1:1935/hls/000
-    VIDEO_PATH: rtsp://172.16.104.173:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
-    CAM_CACHE: false
+  - ALGORITHM:
+      TRACKER:
+        LOS_NUMBER: 15
     CAMERA_TYPE:
-      TYPE: 1
       FISH_MODE: -1
       FORMAT_H264: false
       RTMP_SIZE:
-        WIDTH: 1280
         HEIGHT: 720
-ALGORITHM:
-  TRACKER:
-    LOS_NUMBER: 20
+        WIDTH: 1280
+      TYPE: 1
+    INFERENCE_SWITCH: true
+    CAM_CACHE: false
+    FPS: 10
+    FRAMES_SKIP: 2
+    MAC: '123123123123'
+    QLEN: 10
+    RTMP_INSERT_MODE: 1
+    RTMP_MODE: 1
+    RTMP_PATH:
+      - rtmp://127.0.0.1:1935/hls/000
+    VIDEO_PATH: rtsp://172.16.104.173:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
+  - ALGORITHM:
+      TRACKER:
+        LOS_NUMBER: 15
+    CAMERA_TYPE:
+      FISH_MODE: -1
+      FORMAT_H264: false
+      RTMP_SIZE:
+        HEIGHT: 720
+        WIDTH: 1280
+      TYPE: 1
+    INFERENCE_SWITCH: true
+    CAM_CACHE: false
+    FPS: 10
+    FRAMES_SKIP: 2
+    MAC: '123123123123'
+    QLEN: 10
+    RTMP_INSERT_MODE: 1
+    RTMP_MODE: 1
+    RTMP_PATH:
+      - rtmp://127.0.0.1:1935/hls/001
+    VIDEO_PATH: rtsp://172.16.104.175:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
+
+

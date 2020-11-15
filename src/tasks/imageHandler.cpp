@@ -1,4 +1,6 @@
 #include "tasks/imageHandler.h"
+#include "singleton.h"
+#include "config_yaml.h"
 
 int64_t getCurrentTime_infer()
 {
@@ -12,10 +14,11 @@ imageHandler::imageHandler(){
 }
 
 imageHandler::imageHandler(int camId){
-    Cconfig labels = Cconfig("../cfg/process.ini");
+    yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
+    auto conf = config_A->getConfig();
 
     trEngine    = new Engine_Api();
-    headTracker = new Track(stoi(labels["HEAD_TRACK_MISTIMES"]), stoi(labels["OUT_W"]), stoi(labels["OUT_H"]));
+    headTracker = new Track(conf["CAM"][camId]["ALGORITHM"]["LOS_NUMBER"].as<int>(), 1280, 720);
     pyEngineAPI = new Engine_api("engine_api", camId);
 }
 
@@ -60,13 +63,13 @@ void imageHandler::run(cv::Mat& ret_img){
 
     int64_t business_end = getCurrentTime_infer();
 
-    std::cout << "***********************" << endl;
-    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
-    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
-    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
-    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
-    std::cout << "total time cost -- " << business_end - detect_start << endl;
-    std::cout << "***********************" << endl;
+//    std::cout << "***********************" << endl;
+//    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
+//    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
+//    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
+//    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
+//    std::cout << "total time cost -- " << business_end - detect_start << endl;
+//    std::cout << "***********************" << endl;
 
 }
 

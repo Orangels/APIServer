@@ -17,6 +17,8 @@
 
 #include <Python.h>
 
+#include "tasks/imageHandler.h"
+
 #include "dsHandler.h"
 #include "singleton.h"
 #include "config_yaml.h"
@@ -55,7 +57,8 @@ public:
     vector<mutex *>              mConMutexRTMP;
     vector<mutex *>              mRtmpMutex;
 
-    vector<cv::Mat> mRtmpImg;
+    vector<imageHandler *>       mImageHandlers;
+    vector<cv::Mat>              mRtmpImg;
 
 
 private:
@@ -73,6 +76,10 @@ private:
     void ConsumeRTMPImage(int mode);
 
     void RPCServer();
+
+    int addCam(bool isAdd, int cam_id, string rtsp_str, int is_h264);
+
+    int removeCam(int cam_id);
 
 
     condition_variable vCon_not_full_0, vCon_not_full_1, vCon_not_full_2, vCon_not_full_3;
