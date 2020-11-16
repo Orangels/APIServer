@@ -123,7 +123,8 @@ Dispatch::Dispatch(){
 
             mCamPath[i]       = stream_path;
             mDsHandlers[i]    = new dsHandler(stream_path, 1280, 720, 4000000, i, path_h264, frames_skip);
-            mCon_not_empty[i] = &mDsHandlers[i]->con_v_notification;
+            mCon_not_empty[i] = &mDsHandlers[i]->mCon_not_empty;
+            mCon_not_full[i]  = &mDsHandlers[i]->mCon_not_full;
             mConMutexCam[i]   = &mDsHandlers[i]->myMutex;
             mQueueCam[i]      = &mDsHandlers[i]->imgQueue;
 
@@ -132,7 +133,7 @@ Dispatch::Dispatch(){
 
     }
 
-    mCon_not_full = {&vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3};
+//    mCon_not_full = {&vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3};
     mCon_rtmp     = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
     mConMutexRTMP = {&vConMutexRTMP_0, &vConMutexRTMP_1, &vConMutexRTMP_2, &vConMutexRTMP_3};
     mRtmpMutex    = {&vRtmpMutex_0, &vRtmpMutex_1, &vRtmpMutex_2, &vRtmpMutex_3};
@@ -166,7 +167,7 @@ int Dispatch::addCam(bool isAdd, int cam_id, string rtsp_str, int is_h264){
         cout << "socket Add cam " << cam_id << endl;
 
         mDsHandlers[cam_id]    = new dsHandler(rtsp_str, 1280, 720, 4000000, cam_id, is_h264 ? 0 : 1, frames_skip);
-        mCon_not_empty[cam_id] = &mDsHandlers[cam_id]->con_v_notification;
+        mCon_not_empty[cam_id] = &mDsHandlers[cam_id]->mCon_not_empty;
         mConMutexCam[cam_id]   = &mDsHandlers[cam_id]->myMutex;
         mQueueCam[cam_id]      = &mDsHandlers[cam_id]->imgQueue;
     }
@@ -301,7 +302,7 @@ void Dispatch::RPCServer(){
                                                     frames_skip);
 
                         mDsHandlers[cam_id]    = dsHandler_0;
-                        mCon_not_empty[cam_id] = &dsHandler_0->con_v_notification;
+                        mCon_not_empty[cam_id] = &dsHandler_0->mCon_not_empty;
                         mConMutexCam[cam_id]   = &dsHandler_0->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_0->imgQueue;
                         break;
@@ -310,7 +311,7 @@ void Dispatch::RPCServer(){
                                                     frames_skip);
 
                         mDsHandlers[cam_id]    = dsHandler_1;
-                        mCon_not_empty[cam_id] = &dsHandler_1->con_v_notification;
+                        mCon_not_empty[cam_id] = &dsHandler_1->mCon_not_empty;
                         mConMutexCam[cam_id]   = &dsHandler_1->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_1->imgQueue;
                         break;
@@ -319,7 +320,7 @@ void Dispatch::RPCServer(){
                                                     frames_skip);
 
                         mDsHandlers[cam_id]    = dsHandler_2;
-                        mCon_not_empty[cam_id] = &dsHandler_2->con_v_notification;
+                        mCon_not_empty[cam_id] = &dsHandler_2->mCon_not_empty;
                         mConMutexCam[cam_id]   = &dsHandler_2->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_2->imgQueue;
                         break;
@@ -328,7 +329,7 @@ void Dispatch::RPCServer(){
                                                     frames_skip);
 
                         mDsHandlers[cam_id]    = dsHandler_3;
-                        mCon_not_empty[cam_id] = &dsHandler_3->con_v_notification;
+                        mCon_not_empty[cam_id] = &dsHandler_3->mCon_not_empty;
                         mConMutexCam[cam_id]   = &dsHandler_3->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_3->imgQueue;
                         break;
@@ -429,6 +430,7 @@ void Dispatch::ConsumeRTMPImage(int mode){
         cv::resize(img, img, cv::Size(out_w, out_h));
 
         writer.write(img);
+        writer.write(img);
         rtmpLock->unlock();
         num++;
         if (num == 10000) num = 0;
@@ -489,14 +491,17 @@ void Dispatch::ConsumeImage(int mode){
 
 
     while (mCamLive[mode]) {
+
+        int64_t start_time = getCurrentTime();
+
         std::unique_lock<std::mutex> guard(*lock);
         while (queue->empty()) {
             con_v_wait->wait(guard);
         }
-
+//        int64_t start_time = getCurrentTime();
         frame = queue->front();
         queue->pop();
-        //        con_v_notification->notify_all();
+        con_v_notification->notify_all();
         guard.unlock();
 
         //        TODO 业务逻辑
@@ -504,7 +509,7 @@ void Dispatch::ConsumeImage(int mode){
         if (inference_switch) {
             //            cout << "mode -- " << mode << endl;
             mImageHandlers[mode]->run(ret_img);
-//            mImageHandlers[mode]->vis(ret_img);
+            mImageHandlers[mode]->vis(ret_img);
         }
 
         if (rtmp_mode == 1) {
@@ -517,6 +522,10 @@ void Dispatch::ConsumeImage(int mode){
             rtmpQueue->push(*rtmp_img);
             con_rtmp->notify_all();
         }
+
+        int64_t end_time = getCurrentTime();
+
+        cout << "mode " << mode << " num "<< num <<" total cost -- " << end_time - start_time << endl;
 
         num++;
         if (num == 10000) num = 0;
@@ -535,11 +544,11 @@ void Dispatch::run(){
     for (int i = 0; i < mCamLive.size(); ++i) {
         if (mCamLive[i]) {
             cout << "start woker thread " << endl;
-            threadArr.emplace_back(&Dispatch::ProduceImage, this, i);
             threadArr.emplace_back(&Dispatch::ConsumeImage, this, i);
             threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, i);
 
             this_thread::sleep_for(chrono::seconds(10));
+            threadArr.emplace_back(&Dispatch::ProduceImage, this, i);
         }
     }
 

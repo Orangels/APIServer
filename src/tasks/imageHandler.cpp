@@ -34,12 +34,12 @@ void imageHandler::updateLosNum(int num){
 }
 
 void imageHandler::run(cv::Mat& ret_img){
+    int64_t detect_start = getCurrentTime_infer();
+
     hf_boxs.clear();
     ldmk_boxes.clear();
     rects.clear();
     angles.clear();
-
-    int64_t detect_start = getCurrentTime_infer();
 
     trEngine->detect_headface(ret_img, hf_boxs);
     for (int i = 0; i < hf_boxs.size(); i += 6) {
@@ -67,13 +67,13 @@ void imageHandler::run(cv::Mat& ret_img){
 
     int64_t business_end = getCurrentTime_infer();
 
-//    std::cout << "***********************" << endl;
-//    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
-//    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
-//    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
-//    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
-//    std::cout << "total time cost -- " << business_end - detect_start << endl;
-//    std::cout << "***********************" << endl;
+    std::cout << "***********************" << endl;
+    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
+    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
+    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
+    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
+    std::cout << "total time cost -- " << business_end - detect_start << endl;
+    std::cout << "***********************" << endl;
 
 }
 

@@ -19,7 +19,8 @@
 
 #include "tasks/imageHandler.h"
 
-#include "dsHandler.h"
+//#include "dsHandler.h"
+#include "dsGSTHandler.h"
 #include "singleton.h"
 #include "config_yaml.h"
 
