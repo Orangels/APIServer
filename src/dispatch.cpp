@@ -64,11 +64,11 @@ Dispatch::Dispatch(){
 
     //    yaml Config
     if (conf["CAM"].size() > 0) {
-        if (conf["CAM"][0].Type() == 1){
+        if (conf["CAM"][0].Type() == 1) {
             mQueueLen   = 20;
             frames_skip = 2;
             rtmp_mode   = 1;
-        }else{
+        } else {
             mQueueLen   = conf["CAM"][0]["QLEN"].as<int>();
             frames_skip = conf["CAM"][0]["FRAMES_SKIP"].as<int>();
             rtmp_mode   = conf["CAM"][0]["RTMP_MODE"].as<int>();
@@ -133,7 +133,7 @@ Dispatch::Dispatch(){
 
     }
 
-//    mCon_not_full = {&vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3};
+    //    mCon_not_full = {&vCon_not_full_0, &vCon_not_full_1, &vCon_not_full_2, &vCon_not_full_3};
     mCon_rtmp     = {&vCon_rtmp_0, &vCon_rtmp_1, &vCon_rtmp_2, &vCon_rtmp_3};
     mConMutexRTMP = {&vConMutexRTMP_0, &vConMutexRTMP_1, &vConMutexRTMP_2, &vConMutexRTMP_3};
     mRtmpMutex    = {&vRtmpMutex_0, &vRtmpMutex_1, &vRtmpMutex_2, &vRtmpMutex_3};
@@ -366,11 +366,11 @@ void Dispatch::RPCServer(){
             //            删除
             cout << "socket Del cam " << cam_id << endl;
             mCamLive[cam_id] = false;
-//            this_thread::sleep_for(chrono::milliseconds(200));
+            //            this_thread::sleep_for(chrono::milliseconds(200));
             this_thread::sleep_for(chrono::seconds(3));
             mDsHandlers[cam_id]->finish();
-//            在 produce 线程做结束处理
-//            mDsHandlers[cam_id] = nullptr;
+            //            在 produce 线程做结束处理
+            //            mDsHandlers[cam_id] = nullptr;
             cout << "del cam_id : " << cam_id << endl;
         }
 
@@ -446,7 +446,7 @@ void Dispatch::ProduceImage(int mode){
     mDsHandler->run();
     cout << "produceImage " << mode << " finish" << endl;
     mCamLive[mode]    = false;
-//    delete mDsHandlers[mode];
+    //    delete mDsHandlers[mode];
     mDsHandlers[mode] = nullptr;
 
 }
@@ -471,7 +471,7 @@ void Dispatch::ConsumeImage(int mode){
     cv::Mat            *rtmp_img;
     cv::Mat            ret_img;
 
-    imageHandler* vImageHandler = new imageHandler(mode);
+    imageHandler *vImageHandler = new imageHandler(mode);
     mImageHandlers[mode] = vImageHandler;
 
     lock               = mConMutexCam[mode];
@@ -498,7 +498,7 @@ void Dispatch::ConsumeImage(int mode){
         while (queue->empty()) {
             con_v_wait->wait(guard);
         }
-//        int64_t start_time = getCurrentTime();
+        //        int64_t start_time = getCurrentTime();
         frame = queue->front();
         queue->pop();
         con_v_notification->notify_all();
@@ -508,31 +508,34 @@ void Dispatch::ConsumeImage(int mode){
         ret_img = frame.clone();
         if (inference_switch) {
             //            cout << "mode -- " << mode << endl;
-            mImageHandlers[mode]->run(ret_img);
+            mImageHandlers[mode]->run(ret_img, num);
             mImageHandlers[mode]->vis(ret_img);
         }
 
         if (rtmp_mode == 1) {
             // 推流
-            //            cv::Mat rtmp_frame;
-            //            cv::resize(ret_img, rtmp_frame, cv::Size(out_w, out_h));
-            //            cv::Mat frame_clone = rtmp_frame.clone();
-            //            *rtmp_img = frame_clone;
-            *rtmp_img = ret_img;
-            rtmpQueue->push(*rtmp_img);
+            cv::Mat rtmp_frame;
+            cv::resize(ret_img, rtmp_frame, cv::Size(out_w, out_h));
+            cv::Mat frame_clone = rtmp_frame.clone();
+            rtmpQueue->push(frame_clone);
             con_rtmp->notify_all();
+            //            *rtmp_img = frame_clone;
+            //            *rtmp_img = ret_img;
+            //            rtmpQueue->push(*rtmp_img);
+            //            rtmpQueue->push(ret_img);
+            //            con_rtmp->notify_all();
         }
 
         int64_t end_time = getCurrentTime();
 
-        cout << "mode " << mode << " num "<< num <<" total cost -- " << end_time - start_time << endl;
+//        cout << "mode " << mode << " num " << num << " total cost -- " << end_time - start_time << endl;
 
         num++;
-        if (num == 10000) num = 0;
+//        if (num == 10000) num = 0;
     }
 
     cout << " ConsumeImage finish " << mode << endl;
-//    delete mImageHandlers[mode];
+    //    delete mImageHandlers[mode];
 
 }
 

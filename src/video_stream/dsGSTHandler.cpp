@@ -70,7 +70,7 @@ void dsHandler::run(){
                 mCon_not_full.wait(guard);
             }
 
-            cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
+//            cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
             imgQueue.push(frame);
             mCon_not_empty.notify_all();
             guard.unlock();
