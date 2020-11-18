@@ -107,15 +107,18 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
                 if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
                     if (result_ldmk_boxes_tmp.size()<8){
                         result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
-                        face_tracker_count[trackID] = frameCount;
+                        vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
+                        face_tracker_count[trackID] = face_tracker_count_value;
                         cout << "new track id " << trackID <<" face ldmk" << endl;
                     }
                 } else {
-                    //                    fps: 10 , time: 1s
-                    if (frameCount - face_tracker_count[trackID] > 10 * 1) {
+                    //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
+                    if (frameCount - face_tracker_count[trackID][0] > 10 * 1 ||
+                    head_rect.width * head_rect.height / face_tracker_count[trackID][1] > 1.2) {
                         if (result_ldmk_boxes_tmp.size()<8){
                             result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
-                            face_tracker_count[trackID] = frameCount;
+                            vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
+                            face_tracker_count[trackID] = face_tracker_count_value;
                             cout << "update track id "<< trackID <<" face ldmk" << endl;
                         }
                     }

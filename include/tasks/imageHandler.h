@@ -39,7 +39,8 @@ private:
     std::vector<std::vector<float>> angles;
     std::vector<std::vector<float>> rects;
 
-    std::unordered_map<int, int> face_tracker_count;
+    //key: trackID, value <帧数, 人脸 bbox 面积>
+    std::unordered_map<int, vector<int>> face_tracker_count;
 
     float *mWrects;
     float *mWangles;
