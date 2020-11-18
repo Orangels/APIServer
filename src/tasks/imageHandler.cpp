@@ -15,6 +15,7 @@ imageHandler::imageHandler(){
 
 imageHandler::imageHandler(int camId){
     yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
+//    yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/home/nvidia/Program/api_server/DPH_Server/cfg/config.yaml");
     auto       conf      = config_A->getConfig();
 
     trEngine    = new Engine_Api();
@@ -23,7 +24,7 @@ imageHandler::imageHandler(int camId){
 }
 
 imageHandler::~imageHandler(){
-    //    delete trEngine;
+    delete trEngine;
     delete headTracker;
     delete pyEngineAPI;
     std::cout << "del imageHandler" << endl;
@@ -105,21 +106,21 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
             float    face_scale = computRectJoinUnion(face_rect, head_rect, AJoin, AUnion);
             if (face_scale >= 0.7) {
                 if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
-                    if (result_ldmk_boxes_tmp.size()<8){
+                    if (result_ldmk_boxes_tmp.size() < 8) {
                         result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
                         vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                         face_tracker_count[trackID] = face_tracker_count_value;
-                        cout << "new track id " << trackID <<" face ldmk" << endl;
+                        cout << "new track id " << trackID << " face ldmk" << endl;
                     }
                 } else {
                     //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
                     if (frameCount - face_tracker_count[trackID][0] > 10 * 1 ||
-                    head_rect.width * head_rect.height / face_tracker_count[trackID][1] > 1.2) {
-                        if (result_ldmk_boxes_tmp.size()<8){
+                        head_rect.width * head_rect.height / face_tracker_count[trackID][1] > 1.2) {
+                        if (result_ldmk_boxes_tmp.size() < 8) {
                             result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
                             vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                             face_tracker_count[trackID] = face_tracker_count_value;
-                            cout << "update track id "<< trackID <<" face ldmk" << endl;
+                            cout << "update track id " << trackID << " face ldmk" << endl;
                         }
                     }
                 }
@@ -169,13 +170,13 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
 
     int64_t business_end = getCurrentTime_infer();
 
-//    std::cout << "***********************" << endl;
-//    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
-//    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
-//    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
-//    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
-//    std::cout << "total time cost -- " << business_end - detect_start << endl;
-//    std::cout << "***********************" << endl;
+    //    std::cout << "***********************" << endl;
+    //    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
+    //    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
+    //    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
+    //    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
+    //    std::cout << "total time cost -- " << business_end - detect_start << endl;
+    //    std::cout << "***********************" << endl;
 
 }
 

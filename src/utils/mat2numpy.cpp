@@ -9,7 +9,6 @@ int init_numpy2(){
     import_array();
 }
 
-
 void vec2np(vector<vector<int> > arr, PyObject *vArgList, int singleLen, int *CArrays){
     init_numpy2();
     int      size    = arr.size();

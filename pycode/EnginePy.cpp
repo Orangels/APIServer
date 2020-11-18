@@ -2,6 +2,7 @@
 #include "utils/mat2numpy.h"
 #include <iostream>
 
+
 Engine_api::Engine_api(){
     PyObject *pFile   = NULL;
     PyObject *pModule = NULL;
@@ -64,11 +65,12 @@ Engine_api::Engine_api(){
     Py_END_ALLOW_THREADS;
     PyGILState_Release(gstate);
 
-    printf("Engine_api::Engine_api() end!\n");
+    printf("Engine_api::Engine_api() INIT end!\n");
 }
 
 
 Engine_api::Engine_api(std::string pyClass, int camId){
+
     PyObject *pFile   = NULL;
     PyObject *pModule = NULL;
     PyObject *pClass  = NULL;
@@ -133,7 +135,7 @@ Engine_api::Engine_api(std::string pyClass, int camId){
     Py_END_ALLOW_THREADS;
     PyGILState_Release(gstate);
 
-    printf("Engine_api::Engine_api() end!\n");
+    printf("Engine_api::Engine_api() INIT end!\n");
 }
 
 
@@ -207,7 +209,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
                                                  ArgListDeleteID, ArgListKpts, ArgListAge, ArgListLdmkBoxes);
 
     frame = np2mat(pRetValue);
-
+//
     Py_DECREF(ArgListFrame);
     Py_DECREF(ArgListBBox);
     Py_DECREF(ArgListKpts);

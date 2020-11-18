@@ -545,7 +545,8 @@ void Dispatch::ConsumeImage(int mode){
     guard.unlock();
 
     cout << " ConsumeImage finish " << mode << endl;
-    //    delete mImageHandlers[mode];
+//    这里删除 py 调用会有问题, 暂时不删除
+//    delete mImageHandlers[mode];
 
 }
 

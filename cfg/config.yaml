@@ -1,9 +1,6 @@
 ALGORITHM:
   TRACKER:
     LOS_NUMBER: 15
-SERVER:
-  SPORT: 1900
-  SQUEUE: 20
 CAM:
   - ALGORITHM:
       TRACKER:
@@ -12,15 +9,15 @@ CAM:
       FISH_MODE: -1
       FORMAT_H264: false
       RTMP_SIZE:
-        HEIGHT: 720
-        WIDTH: 1280
+        HEIGHT: 360
+        WIDTH: 640
       TYPE: 1
-    INFERENCE_SWITCH: true
     CAM_CACHE: false
-    FPS: 10
+    FPS: 20
     FRAMES_SKIP: 2
-    MAC: '123123123123'
-    QLEN: 10
+    INFERENCE_SWITCH: true
+    MAC: '222222222221'
+    QLEN: 20
     RTMP_INSERT_MODE: 1
     RTMP_MODE: 1
     RTMP_PATH:
@@ -33,19 +30,20 @@ CAM:
       FISH_MODE: -1
       FORMAT_H264: false
       RTMP_SIZE:
-        HEIGHT: 720
-        WIDTH: 1280
+        HEIGHT: 360
+        WIDTH: 640
       TYPE: 1
-    INFERENCE_SWITCH: true
     CAM_CACHE: false
-    FPS: 10
+    FPS: 20
     FRAMES_SKIP: 2
-    MAC: '123123123123'
-    QLEN: 10
+    INFERENCE_SWITCH: true
+    MAC: '123456789123'
+    QLEN: 20
     RTMP_INSERT_MODE: 1
     RTMP_MODE: 1
     RTMP_PATH:
       - rtmp://127.0.0.1:1935/hls/001
-    VIDEO_PATH: rtsp://172.16.104.175:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
-
-
+    VIDEO_PATH: rtsp://172.16.104.173:554/user=admin&password=admin&channel=1&stream=0.sdp?real_stream
+SERVER:
+  SPORT: 1900
+  SQUEUE: 20
