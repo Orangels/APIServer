@@ -5,13 +5,11 @@
 #include "dsGSTHandler.h"
 
 
-int64_t getCurrentTime_ds()
-{
+int64_t getCurrentTime_ds(){
     struct timeval tv;
-    gettimeofday(&tv,NULL);
+    gettimeofday(&tv, NULL);
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
-
 
 
 dsHandler::dsHandler(){
@@ -25,22 +23,40 @@ dsHandler::dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT
 
     //    mode 0 h264, mode 1 h265
     string camPath = "";
-
+    bool   isRtsp  = vRTSPCAM.find("rtsp") != string::npos ? true : false;
     switch (mode) {
         case 0:
-            camPath = "rtspsrc location=" + vRTSPCAM +
-                      " latency=0 ! rtph264depay ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
-                      to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
-                      ", format=(string)BGRx ! videoconvert ! appsink";
+            if (isRtsp) {
+                camPath = "rtspsrc location=" + vRTSPCAM +
+                          " latency=0 ! rtph264depay ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
+                          to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
+                          ", format=(string)BGRx ! videoconvert ! appsink";
+            } else {
+                camPath = "filesrc location=" + vRTSPCAM +
+                          " ! qtdemux ! queue ! h264parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
+                          to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
+                          ", format=(string)BGRx ! videoconvert ! appsink";
+            }
             break;
         case 1:
-            camPath = "rtspsrc location=" + vRTSPCAM +
-                      " latency=0 ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
-                      to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
-                      ", format=(string)BGRx ! videoconvert ! appsink";
+            if (isRtsp) {
+                camPath = "rtspsrc location=" + vRTSPCAM +
+                          " latency=0 ! rtph265depay ! h265parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
+                          to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
+                          ", format=(string)BGRx ! videoconvert ! appsink";
+            } else {
+                camPath = "filesrc location=" + vRTSPCAM +
+                          " ! qtdemux ! queue ! h265parse ! nvv4l2decoder ! nvvidconv ! video/x-raw, width=(int)" +
+                          to_string(vMUXER_OUTPUT_WIDTH) + ", height=(int)" + to_string(vMUXER_OUTPUT_HEIGHT) +
+                          ", format=(string)BGRx ! videoconvert ! appsink";
+            }
+
             break;
     }
-    RTSPCAM        = camPath;
+    cout << "******" << endl;
+    cout << camPath << endl;
+    cout << "******" << endl;
+    RTSPCAM = camPath;
 }
 
 void dsHandler::run(){
@@ -70,7 +86,7 @@ void dsHandler::run(){
                 mCon_not_full.wait(guard);
             }
 
-//            cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
+            //            cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
             imgQueue.push(frame);
             mCon_not_empty.notify_all();
             guard.unlock();

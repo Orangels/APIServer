@@ -10,6 +10,19 @@ int init_numpy2(){
 }
 
 
+void vec2np(vector<vector<int> > arr, PyObject *vArgList, int singleLen, int *CArrays){
+    init_numpy2();
+    int      size    = arr.size();
+    npy_intp Dims[2] = {size, singleLen}; //注意这个维度数据！
+//    std::copy(arr.begin(), arr.end(), CArrays);
+    for (int i = 0; i < size; ++i) {
+        std::copy((*(arr.begin()+i)).begin(), (*(arr.begin()+i)).end(), CArrays+i*singleLen);
+    }
+    PyObject *PyArray = PyArray_SimpleNewFromData(2, Dims, NPY_INT, CArrays);
+    PyTuple_SetItem(vArgList, 0, PyArray);
+}
+
+
 void vec2np(vector<int> arr, PyObject *vArgList, int singleLen, int *CArrays){
     init_numpy2();
     int      size    = arr.size();

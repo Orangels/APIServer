@@ -105,13 +105,19 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
             float    face_scale = computRectJoinUnion(face_rect, head_rect, AJoin, AUnion);
             if (face_scale >= 0.7) {
                 if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
-                    face_tracker_count[trackID] = frameCount;
-                    result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
-                } else {
-                    //                    fps: 10 , time: 5s
-                    if (frameCount - face_tracker_count[trackID] > 10 * 5) {
-                        face_tracker_count[trackID] = frameCount;
+                    if (result_ldmk_boxes_tmp.size()<8){
                         result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+                        face_tracker_count[trackID] = frameCount;
+                        cout << "new track id " << trackID <<" face ldmk" << endl;
+                    }
+                } else {
+                    //                    fps: 10 , time: 1s
+                    if (frameCount - face_tracker_count[trackID] > 10 * 1) {
+                        if (result_ldmk_boxes_tmp.size()<8){
+                            result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+                            face_tracker_count[trackID] = frameCount;
+                            cout << "update track id "<< trackID <<" face ldmk" << endl;
+                        }
                     }
                 }
                 break;

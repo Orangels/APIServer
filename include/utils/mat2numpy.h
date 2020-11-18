@@ -8,6 +8,7 @@ using namespace std;
 
 void mat2np(cv::Mat img, PyObject* ArgList, uchar *CArrays);
 
+void vec2np(vector<vector<int> > arr, PyObject *vArgList, int singleLen, int *CArrays);
 void vec2np(vector<int> arr, PyObject* vArgList, int singleLen, int* CArrays);
 void vec2np(vector<float> arr, PyObject* vArgList, int singleLen, float * CArrays);
 void vec2np(PyObject* vArgList, int size, int singleLen, float* CArrays);

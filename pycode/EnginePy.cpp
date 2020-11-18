@@ -163,17 +163,17 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
                             std::vector<float> kptsArr, std::vector<float> ageGenderArr){
     PyObject *pyResult;
 
-    auto  sz                = frame.size();
-    int   x                 = sz.width;
-    int   y                 = sz.height;
-    int   z                 = frame.channels();
-    uchar *CArrays          = new uchar[x * y * z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
-    int   *CArrays_bbox     = new int[hf_boxs.size()];
-    int   *CArrays_trackID  = new int[trackIDs.size()];
-    int   *CArrays_deleteID = new int[deleteIDs.size()];
-    float *CArrays_kpts     = new float[kptsArr.size()];
-    float *CArrays_age      = new float[ageGenderArr.size()];
-
+    auto  sz                  = frame.size();
+    int   x                   = sz.width;
+    int   y                   = sz.height;
+    int   z                   = frame.channels();
+    uchar *CArrays            = new uchar[x * y * z];//这一行申请的内存需要释放指针，否则存在内存泄漏的问题
+    int   *CArrays_bbox       = new int[hf_boxs.size()];
+    int   *CArrays_trackID    = new int[trackIDs.size()];
+    int   *CArrays_deleteID   = new int[deleteIDs.size()];
+    float *CArrays_kpts       = new float[kptsArr.size()];
+    float *CArrays_age        = new float[ageGenderArr.size()];
+    int   *CArrays_ldmk_boxes = new int[ldmk_boxes.size() * 4];
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
@@ -198,10 +198,13 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
     PyObject *ArgListDeleteID = PyTuple_New(1);
     vec2np(deleteIDs, ArgListDeleteID, 1, CArrays_deleteID);
 
+    PyObject *ArgListLdmkBoxes = PyTuple_New(1);
+    vec2np(ldmk_boxes, ArgListLdmkBoxes, 4, CArrays_ldmk_boxes);
+
     std::string pyMethod   = "get_result";
-    PyObject    *pRetValue = PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOO", ArgListFrame, ArgListBBox,
+    PyObject    *pRetValue = PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOOO", ArgListFrame, ArgListBBox,
                                                  ArgListTrackID,
-                                                 ArgListDeleteID, ArgListKpts, ArgListAge);
+                                                 ArgListDeleteID, ArgListKpts, ArgListAge, ArgListLdmkBoxes);
 
     frame = np2mat(pRetValue);
 
@@ -211,6 +214,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
     Py_DECREF(ArgListAge);
     Py_DECREF(ArgListTrackID);
     Py_DECREF(ArgListDeleteID);
+    Py_DECREF(ArgListLdmkBoxes);
     Py_DECREF(pRetValue);
 
     delete[]CArrays;
@@ -227,6 +231,9 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
 
     delete[]CArrays_age;
     CArrays_age = nullptr;
+
+    delete[]CArrays_ldmk_boxes;
+    CArrays_ldmk_boxes = nullptr;
 
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;
