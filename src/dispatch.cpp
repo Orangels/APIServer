@@ -367,7 +367,8 @@ void Dispatch::RPCServer(){
             cout << "socket Del cam " << cam_id << endl;
             mCamLive[cam_id] = false;
             //            this_thread::sleep_for(chrono::milliseconds(200));
-            this_thread::sleep_for(chrono::seconds(3));
+//            this_thread::sleep_for(chrono::seconds(3));
+            cout << "produce pre del" << endl;
             mDsHandlers[cam_id]->finish();
             //            在 produce 线程做结束处理
             //            mDsHandlers[cam_id] = nullptr;
@@ -533,6 +534,15 @@ void Dispatch::ConsumeImage(int mode){
         num++;
 //        if (num == 10000) num = 0;
     }
+
+
+    //结束线程, 清理缓存
+    std::unique_lock<std::mutex> guard(*lock);
+    for (int i = 0; i < queue->size(); ++i) {
+        queue->pop();
+        con_v_notification->notify_all();
+    }
+    guard.unlock();
 
     cout << " ConsumeImage finish " << mode << endl;
     //    delete mImageHandlers[mode];

@@ -102,8 +102,13 @@ void dsHandler::run(){
         }
 
     }
+
+    cout << "Produce over ." << endl;
 }
 
 void dsHandler::finish(){
+    cout << "dsGSTHandler finish start "<< endl;
     state = 0;
+    mCon_not_full.notify_all();
+    cout << "dsGSTHandler finish finish "<< endl;
 }

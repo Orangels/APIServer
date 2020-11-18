@@ -169,13 +169,13 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
 
     int64_t business_end = getCurrentTime_infer();
 
-    std::cout << "***********************" << endl;
-    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
-    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
-    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
-    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
-    std::cout << "total time cost -- " << business_end - detect_start << endl;
-    std::cout << "***********************" << endl;
+//    std::cout << "***********************" << endl;
+//    std::cout << "ldmk_boxes size -- " << ldmk_boxes.size() << endl;
+//    std::cout << "detection time cost -- " << detect_end - detect_start << endl;
+//    std::cout << "angle and age time cost -- " << ageGender_end - detect_end << endl;
+//    std::cout << "business time cost -- " << business_end - ageGender_end << endl;
+//    std::cout << "total time cost -- " << business_end - detect_start << endl;
+//    std::cout << "***********************" << endl;
 
 }
 
