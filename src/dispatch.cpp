@@ -546,7 +546,7 @@ void Dispatch::ConsumeImage(int mode){
 
     cout << " ConsumeImage finish " << mode << endl;
 //    这里删除 py 调用会有问题, 暂时不删除
-//    delete mImageHandlers[mode];
+    delete mImageHandlers[mode];
 
 }
 
