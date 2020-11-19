@@ -175,7 +175,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
     int   *CArrays_deleteID   = new int[deleteIDs.size()];
     float *CArrays_kpts       = new float[kptsArr.size()];
     float *CArrays_age        = new float[ageGenderArr.size()];
-    int   *CArrays_ldmk_boxes = new int[ldmk_boxes.size() * 4];
+    int   *CArrays_ldmk_boxes = new int[ldmk_boxes.size() * 6];
 
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure(); //申请获取GIL
@@ -201,7 +201,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
     vec2np(deleteIDs, ArgListDeleteID, 1, CArrays_deleteID);
 
     PyObject *ArgListLdmkBoxes = PyTuple_New(1);
-    vec2np(ldmk_boxes, ArgListLdmkBoxes, 4, CArrays_ldmk_boxes);
+    vec2np(ldmk_boxes, ArgListLdmkBoxes, 6, CArrays_ldmk_boxes);
 
     std::string pyMethod   = "get_result";
     PyObject    *pRetValue = PyObject_CallMethod(m_pHandle, pyMethod.c_str(), "OOOOOOO", ArgListFrame, ArgListBBox,

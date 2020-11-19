@@ -65,7 +65,7 @@ float computRectJoinUnion(const cv::Rect &rc1, const cv::Rect &rc2, float &AJoin
         return 0;
 }
 
-std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vHf_boxs,
+std::vector <std::vector <std::vector<int>> > imageHandler::bindFaceTracker(std::vector<int> vHf_boxs,
                                                              std::vector<int> tracking_result){
 
     yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
@@ -76,7 +76,10 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
     int   fps                               = conf["CAM"][camId]["FPS"].as<int>();
     int   frames_skip                       = conf["CAM"][camId]["FRAMES_SKIP"].as<int>();
 
+
+    std::vector <std::vector <std::vector<int>> > result;
     std::vector <std::vector<int>> result_ldmk_boxes_tmp;
+    std::vector <std::vector<int>> result_ldmk_boxes_with_trackID_index;
     std::vector <std::vector<int>> head_boxs_tmp;
     std::vector <std::vector<int>> ldmk_boxes_tmp;
     int                            head_num = 0;
@@ -84,7 +87,7 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
     for (int i = 0; i < vHf_boxs.size(); i += 6) {
         if (hf_boxs[i + 5] == 1) {
             std::vector<int> box_tmp = {hf_boxs[i], hf_boxs[i + 1], hf_boxs[i + 2], hf_boxs[i + 3],
-                                        tracking_result[head_num]};
+                                        tracking_result[head_num], head_num};
             head_boxs_tmp.emplace_back(box_tmp);
             head_num += 1;
         } else if (hf_boxs[i + 5] == 2) {
@@ -102,11 +105,12 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
         cv::Rect face_rect = cv::Rect(face_xmin, face_ymin, face_xmax - face_xmin, face_ymax - face_ymin);
 
         for (int j = 0; j < head_boxs_tmp.size(); ++j) {
-            int head_xmin = head_boxs_tmp[j][0];
-            int head_ymin = head_boxs_tmp[j][1];
-            int head_xmax = head_boxs_tmp[j][2];
-            int head_ymax = head_boxs_tmp[j][3];
-            int trackID   = head_boxs_tmp[j][4];
+            int head_xmin  = head_boxs_tmp[j][0];
+            int head_ymin  = head_boxs_tmp[j][1];
+            int head_xmax  = head_boxs_tmp[j][2];
+            int head_ymax  = head_boxs_tmp[j][3];
+            int trackID    = head_boxs_tmp[j][4];
+            int head_index = head_boxs_tmp[j][5];
 
             cv::Rect head_rect  = cv::Rect(head_xmin, head_ymin, head_xmax - head_xmin, head_ymax - head_ymin);
             float    AJoin, AUnion;
@@ -115,6 +119,10 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
                 if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
                     if (result_ldmk_boxes_tmp.size() < 8) {
                         result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+
+                        std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
+                        result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
+
                         vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                         face_tracker_count[trackID] = face_tracker_count_value;
                         //                        cout << "new track id " << trackID << " face ldmk" << endl;
@@ -125,6 +133,10 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
                         head_rect.width * head_rect.height / face_tracker_count[trackID][1] > area_scale) {
                         if (result_ldmk_boxes_tmp.size() < 8) {
                             result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+
+                            std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
+                            result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
+
                             vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                             face_tracker_count[trackID] = face_tracker_count_value;
                             //                            cout << "update track id " << trackID << " face ldmk" << endl;
@@ -135,8 +147,10 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
             }
         }
     }
+    result.emplace_back(result_ldmk_boxes_tmp);
+    result.emplace_back(result_ldmk_boxes_with_trackID_index);
 
-    return result_ldmk_boxes_tmp;
+    return result;
 
 }
 
@@ -148,6 +162,8 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
     ldmk_boxes.clear();
     rects.clear();
     angles.clear();
+    vWangles.clear();
+    vWrects.clear();
 
     trEngine->detect_headface(ret_img, hf_boxs);
     //    for (int i = 0; i < hf_boxs.size(); i += 6) {
@@ -158,7 +174,8 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
     //    }
 
     headTracker->run(hf_boxs, 1);
-    ldmk_boxes = bindFaceTracker(hf_boxs, headTracker->tracking_result);
+    std::vector <std::vector <std::vector<int>> > result = bindFaceTracker(hf_boxs, headTracker->tracking_result);
+    ldmk_boxes = result[0];
 
 
     int64_t detect_end = getCurrentTime_infer();
@@ -174,7 +191,7 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
 
 
     pyEngineAPI->get_result(ret_img, hf_boxs, headTracker->tracking_result, headTracker->delete_tracking_id,
-                            ldmk_boxes, vWangles, vWrects);
+                            result[1], vWangles, vWrects);
 
 
     int64_t business_end = getCurrentTime_infer();

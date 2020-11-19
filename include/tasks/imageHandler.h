@@ -29,9 +29,9 @@ public:
 
     cv::Mat frame;
 private:
-    Engine_Api *trEngine;
-    Track      *headTracker;
-    Engine_api *pyEngineAPI;
+    Engine_Api                      *trEngine;
+    Track                           *headTracker;
+    Engine_api                      *pyEngineAPI;
     std::vector<int>                hf_boxs;
     std::vector<float>              vWangles;
     std::vector<float>              vWrects;
@@ -40,16 +40,16 @@ private:
     std::vector<std::vector<float>> rects;
 
     //key: trackID, value <帧数, 人脸 bbox 面积>
-    std::unordered_map<int, vector<int>> face_tracker_count;
+    std::unordered_map<int, vector < int>> face_tracker_count;
 
     float *mWrects;
     float *mWangles;
-    int frameCount;
-    int camId;
+    int   frameCount;
+    int   camId;
 
 
-    std::vector<std::vector<int>> bindFaceTracker(std::vector<int> vHf_boxs,
-                                                  std::vector<int> tracking_result);
+    std::vector<std::vector<std::vector<int>>> bindFaceTracker(std::vector<int> vHf_boxs,
+                                                               std::vector<int> tracking_result);
 };
 
 
