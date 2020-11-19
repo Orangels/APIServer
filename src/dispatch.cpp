@@ -303,6 +303,7 @@ void Dispatch::RPCServer(){
 
                         mDsHandlers[cam_id]    = dsHandler_0;
                         mCon_not_empty[cam_id] = &dsHandler_0->mCon_not_empty;
+                        mCon_not_full[cam_id]  = &dsHandler_0->mCon_not_full;
                         mConMutexCam[cam_id]   = &dsHandler_0->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_0->imgQueue;
                         break;
@@ -312,6 +313,7 @@ void Dispatch::RPCServer(){
 
                         mDsHandlers[cam_id]    = dsHandler_1;
                         mCon_not_empty[cam_id] = &dsHandler_1->mCon_not_empty;
+                        mCon_not_full[cam_id]  = &dsHandler_1->mCon_not_full;
                         mConMutexCam[cam_id]   = &dsHandler_1->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_1->imgQueue;
                         break;
@@ -321,6 +323,7 @@ void Dispatch::RPCServer(){
 
                         mDsHandlers[cam_id]    = dsHandler_2;
                         mCon_not_empty[cam_id] = &dsHandler_2->mCon_not_empty;
+                        mCon_not_full[cam_id]  = &dsHandler_2->mCon_not_full;
                         mConMutexCam[cam_id]   = &dsHandler_2->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_2->imgQueue;
                         break;
@@ -330,6 +333,7 @@ void Dispatch::RPCServer(){
 
                         mDsHandlers[cam_id]    = dsHandler_3;
                         mCon_not_empty[cam_id] = &dsHandler_3->mCon_not_empty;
+                        mCon_not_full[cam_id]  = &dsHandler_3->mCon_not_full;
                         mConMutexCam[cam_id]   = &dsHandler_3->myMutex;
                         mQueueCam[cam_id]      = &dsHandler_3->imgQueue;
                         break;
@@ -367,7 +371,7 @@ void Dispatch::RPCServer(){
             cout << "socket Del cam " << cam_id << endl;
             mCamLive[cam_id] = false;
             //            this_thread::sleep_for(chrono::milliseconds(200));
-//            this_thread::sleep_for(chrono::seconds(3));
+            //            this_thread::sleep_for(chrono::seconds(3));
             cout << "produce pre del" << endl;
             mDsHandlers[cam_id]->finish();
             //            在 produce 线程做结束处理
@@ -446,8 +450,8 @@ void Dispatch::ProduceImage(int mode){
     dsHandler *mDsHandler = mDsHandlers[mode];
     mDsHandler->run();
     cout << "produceImage " << mode << " finish" << endl;
-    mCamLive[mode]    = false;
-    //    delete mDsHandlers[mode];
+    mCamLive[mode] = false;
+    delete mDsHandlers[mode];
     mDsHandlers[mode] = nullptr;
 
 }
@@ -475,13 +479,13 @@ void Dispatch::ConsumeImage(int mode){
     imageHandler *vImageHandler = new imageHandler(mode);
     mImageHandlers[mode] = vImageHandler;
 
-    lock               = mConMutexCam[mode];
-    queue              = mQueueCam[mode];
-    rtmpQueue          = &mQueue_rtmp[mode];
-    con_v_wait         = mCon_not_empty[mode];
-    con_v_notification = mCon_not_full[mode];
-    con_rtmp           = mCon_rtmp[mode];
-    rtmp_img           = &mRtmpImg[mode];
+    lock                           = mConMutexCam[mode];
+    queue                          = mQueueCam[mode];
+    rtmpQueue                      = &mQueue_rtmp[mode];
+    con_v_wait                     = mCon_not_empty[mode];
+    con_v_notification             = mCon_not_full[mode];
+    con_rtmp                       = mCon_rtmp[mode];
+    rtmp_img                       = &mRtmpImg[mode];
 
     cout << "ConsumeImage  start " << endl;
     cout << lock << endl;
@@ -529,23 +533,23 @@ void Dispatch::ConsumeImage(int mode){
 
         int64_t end_time = getCurrentTime();
 
-//        cout << "mode " << mode << " num " << num << " total cost -- " << end_time - start_time << endl;
+        //        cout << "mode " << mode << " num " << num << " total cost -- " << end_time - start_time << endl;
 
         num++;
-//        if (num == 10000) num = 0;
+        //        if (num == 10000) num = 0;
     }
 
 
     //结束线程, 清理缓存
     std::unique_lock<std::mutex> guard(*lock);
-    for (int i = 0; i < queue->size(); ++i) {
+    for (int                     i = 0; i < queue->size(); ++i) {
         queue->pop();
         con_v_notification->notify_all();
     }
     guard.unlock();
 
     cout << " ConsumeImage finish " << mode << endl;
-//    这里删除 py 调用会有问题, 暂时不删除
+    //    这里删除 py 调用会有问题, 暂时不删除
     delete mImageHandlers[mode];
 
 }
