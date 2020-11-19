@@ -122,8 +122,8 @@ Engine_api::Engine_api(std::string pyClass, int camId){
 
     if (pClass)
         Py_DECREF(pClass);
-    if (m_pDict)
-        Py_DECREF(m_pDict);
+//    if (m_pDict)
+//        Py_DECREF(m_pDict);
     if (pModule)
         Py_DECREF(pModule);
     if (pFile)
@@ -147,8 +147,8 @@ Engine_api::~Engine_api(){
 
     if (m_pHandle)
         Py_DECREF(m_pHandle);
-    if (m_pDict)
-        Py_DECREF(m_pDict);
+//    if (m_pDict)
+//        Py_DECREF(m_pDict);
 
     Py_UNBLOCK_THREADS;
     Py_END_ALLOW_THREADS;
@@ -208,7 +208,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
                                                  ArgListTrackID,
                                                  ArgListDeleteID, ArgListKpts, ArgListAge, ArgListLdmkBoxes);
 
-    frame = np2mat(pRetValue);
+//    frame = np2mat(pRetValue);
 //
     Py_DECREF(ArgListFrame);
     Py_DECREF(ArgListBBox);

@@ -341,9 +341,10 @@ void Dispatch::RPCServer(){
                         break;
                 }
 
-                threadArr.emplace_back(&Dispatch::ProduceImage, this, cam_id);
                 threadArr.emplace_back(&Dispatch::ConsumeImage, this, cam_id);
                 threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, cam_id);
+                this_thread::sleep_for(chrono::seconds(10));
+                threadArr.emplace_back(&Dispatch::ProduceImage, this, cam_id);
             }
 
         } else if (string("set").compare(cmd_str) == 0) {

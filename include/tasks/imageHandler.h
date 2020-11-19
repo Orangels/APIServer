@@ -45,6 +45,7 @@ private:
     float *mWrects;
     float *mWangles;
     int frameCount;
+    int camId;
 
 
     std::vector<std::vector<int>> bindFaceTracker(std::vector<int> vHf_boxs,

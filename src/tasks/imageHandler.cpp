@@ -13,9 +13,8 @@ imageHandler::imageHandler(){
 
 }
 
-imageHandler::imageHandler(int camId){
+imageHandler::imageHandler(int vCamId) : camId(vCamId){
     yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
-//    yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/home/nvidia/Program/api_server/DPH_Server/cfg/config.yaml");
     auto       conf      = config_A->getConfig();
 
     trEngine    = new Engine_Api();
@@ -69,6 +68,12 @@ float computRectJoinUnion(const cv::Rect &rc1, const cv::Rect &rc2, float &AJoin
 std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vHf_boxs,
                                                              std::vector<int> tracking_result){
 
+    yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
+    auto       conf      = config_A->getConfig();
+
+    int interval = conf["CAM"][camId]["ALGORITHM"]["KPT"]["INTERVAL"].as<int>();
+    float area_scale = conf["CAM"][camId]["ALGORITHM"]["KPT"]["AREA_SCALE"].as<float>();
+
     std::vector <std::vector<int>> result_ldmk_boxes_tmp;
     std::vector <std::vector<int>> head_boxs_tmp;
     std::vector <std::vector<int>> ldmk_boxes_tmp;
@@ -110,17 +115,17 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
                         result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
                         vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                         face_tracker_count[trackID] = face_tracker_count_value;
-                        cout << "new track id " << trackID << " face ldmk" << endl;
+                        //                        cout << "new track id " << trackID << " face ldmk" << endl;
                     }
                 } else {
                     //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
-                    if (frameCount - face_tracker_count[trackID][0] > 10 * 1 ||
-                        head_rect.width * head_rect.height / face_tracker_count[trackID][1] > 1.2) {
+                    if (frameCount - face_tracker_count[trackID][0] > 10 * interval ||
+                        head_rect.width * head_rect.height / face_tracker_count[trackID][1] > area_scale) {
                         if (result_ldmk_boxes_tmp.size() < 8) {
                             result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
                             vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
                             face_tracker_count[trackID] = face_tracker_count_value;
-                            cout << "update track id " << trackID << " face ldmk" << endl;
+                            //                            cout << "update track id " << trackID << " face ldmk" << endl;
                         }
                     }
                 }
@@ -165,8 +170,10 @@ void imageHandler::run(cv::Mat &ret_img, int vFrameCount){
 
     int64_t ageGender_end = getCurrentTime_infer();
 
+
     pyEngineAPI->get_result(ret_img, hf_boxs, headTracker->tracking_result, headTracker->delete_tracking_id,
                             ldmk_boxes, vWangles, vWrects);
+
 
     int64_t business_end = getCurrentTime_infer();
 
