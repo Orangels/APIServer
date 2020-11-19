@@ -208,7 +208,7 @@ void Engine_api::get_result(Mat &frame, std::vector<int> hf_boxs, std::vector<in
                                                  ArgListTrackID,
                                                  ArgListDeleteID, ArgListKpts, ArgListAge, ArgListLdmkBoxes);
 
-//    frame = np2mat(pRetValue);
+    frame = np2mat(pRetValue);
 //
     Py_DECREF(ArgListFrame);
     Py_DECREF(ArgListBBox);

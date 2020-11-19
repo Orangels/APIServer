@@ -71,8 +71,10 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
     yamlConfig *config_A = Singleton<yamlConfig>::GetInstance("/srv/media_info.yaml");
     auto       conf      = config_A->getConfig();
 
-    int interval = conf["CAM"][camId]["ALGORITHM"]["KPT"]["INTERVAL"].as<int>();
-    float area_scale = conf["CAM"][camId]["ALGORITHM"]["KPT"]["AREA_SCALE"].as<float>();
+    float interval                          = conf["CAM"][camId]["ALGORITHM"]["KPT"]["INTERVAL"].as<float>();
+    float area_scale                        = conf["CAM"][camId]["ALGORITHM"]["KPT"]["AREA_SCALE"].as<float>();
+    int   fps                               = conf["CAM"][camId]["FPS"].as<int>();
+    int   frames_skip                       = conf["CAM"][camId]["FRAMES_SKIP"].as<int>();
 
     std::vector <std::vector<int>> result_ldmk_boxes_tmp;
     std::vector <std::vector<int>> head_boxs_tmp;
@@ -119,7 +121,7 @@ std::vector <std::vector<int>> imageHandler::bindFaceTracker(std::vector<int> vH
                     }
                 } else {
                     //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
-                    if (frameCount - face_tracker_count[trackID][0] > 10 * interval ||
+                    if (frameCount - face_tracker_count[trackID][0] > (fps / frames_skip) * interval ||
                         head_rect.width * head_rect.height / face_tracker_count[trackID][1] > area_scale) {
                         if (result_ldmk_boxes_tmp.size() < 8) {
                             result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);

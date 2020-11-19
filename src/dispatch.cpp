@@ -515,7 +515,7 @@ void Dispatch::ConsumeImage(int mode){
         if (inference_switch) {
             //            cout << "mode -- " << mode << endl;
             mImageHandlers[mode]->run(ret_img, num);
-            mImageHandlers[mode]->vis(ret_img);
+//            mImageHandlers[mode]->vis(ret_img);
         }
 
         if (rtmp_mode == 1) {
