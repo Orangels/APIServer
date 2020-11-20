@@ -96,57 +96,98 @@ std::vector <std::vector <std::vector<int>> > imageHandler::bindFaceTracker(std:
         }
     }
 
-    //    bind face
     for (int i = 0; i < ldmk_boxes_tmp.size(); ++i) {
         int      face_xmin = ldmk_boxes_tmp[i][0];
         int      face_ymin = ldmk_boxes_tmp[i][1];
         int      face_xmax = ldmk_boxes_tmp[i][2];
         int      face_ymax = ldmk_boxes_tmp[i][3];
+        int      trackID   = tracking_result[i];
         cv::Rect face_rect = cv::Rect(face_xmin, face_ymin, face_xmax - face_xmin, face_ymax - face_ymin);
 
-        for (int j = 0; j < head_boxs_tmp.size(); ++j) {
-            int head_xmin  = head_boxs_tmp[j][0];
-            int head_ymin  = head_boxs_tmp[j][1];
-            int head_xmax  = head_boxs_tmp[j][2];
-            int head_ymax  = head_boxs_tmp[j][3];
-            int trackID    = head_boxs_tmp[j][4];
-            int head_index = head_boxs_tmp[j][5];
+        if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
+            if (result_ldmk_boxes_tmp.size() < 8) {
+                result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
 
-            cv::Rect head_rect  = cv::Rect(head_xmin, head_ymin, head_xmax - head_xmin, head_ymax - head_ymin);
-            float    AJoin, AUnion;
-            float    face_scale = computRectJoinUnion(face_rect, head_rect, AJoin, AUnion);
-            if (face_scale >= 0.7) {
-                if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
-                    if (result_ldmk_boxes_tmp.size() < 8) {
-                        result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+                std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, i};
+                result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
 
-                        std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
-                        result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
+                vector<int> face_tracker_count_value = {frameCount, face_rect.width * face_rect.height};
+                face_tracker_count[trackID] = face_tracker_count_value;
+//                        cout << "new track id " << trackID << " face ldmk" << endl;
+            }
+        } else {
+//                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
+            if (frameCount - face_tracker_count[trackID][0] > (fps / frames_skip) * interval ||
+                face_rect.width * face_rect.height / face_tracker_count[trackID][1] > area_scale) {
+                if (result_ldmk_boxes_tmp.size() < 8) {
+                    result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
 
-                        vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
-                        face_tracker_count[trackID] = face_tracker_count_value;
-                        //                        cout << "new track id " << trackID << " face ldmk" << endl;
-                    }
-                } else {
-                    //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
-                    if (frameCount - face_tracker_count[trackID][0] > (fps / frames_skip) * interval ||
-                        head_rect.width * head_rect.height / face_tracker_count[trackID][1] > area_scale) {
-                        if (result_ldmk_boxes_tmp.size() < 8) {
-                            result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+                    std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, i};
+                    result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
 
-                            std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
-                            result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
-
-                            vector<int> face_tracker_count_value = {frameCount, head_rect.width * head_rect.height};
-                            face_tracker_count[trackID] = face_tracker_count_value;
-                            //                            cout << "update track id " << trackID << " face ldmk" << endl;
-                        }
-                    }
+                    vector<int> face_tracker_count_value = {frameCount, face_rect.width * face_rect.height};
+                    face_tracker_count[trackID] = face_tracker_count_value;
+//                            cout << "update track id " << trackID << " face ldmk" << endl;
                 }
-                break;
             }
         }
+
+
     }
+
+
+
+    //    bind face
+//    for (int i = 0; i < ldmk_boxes_tmp.size(); ++i) {
+//        int      face_xmin = ldmk_boxes_tmp[i][0];
+//        int      face_ymin = ldmk_boxes_tmp[i][1];
+//        int      face_xmax = ldmk_boxes_tmp[i][2];
+//        int      face_ymax = ldmk_boxes_tmp[i][3];
+//        cv::Rect face_rect = cv::Rect(face_xmin, face_ymin, face_xmax - face_xmin, face_ymax - face_ymin);
+//
+//        for (int j = 0; j < head_boxs_tmp.size(); ++j) {
+//            int head_xmin  = head_boxs_tmp[j][0];
+//            int head_ymin  = head_boxs_tmp[j][1];
+//            int head_xmax  = head_boxs_tmp[j][2];
+//            int head_ymax  = head_boxs_tmp[j][3];
+//            int trackID    = head_boxs_tmp[j][4];
+//            int head_index = head_boxs_tmp[j][5];
+//
+//            cv::Rect head_rect  = cv::Rect(head_xmin, head_ymin, head_xmax - head_xmin, head_ymax - head_ymin);
+//            float    AJoin, AUnion;
+//            float    face_scale = computRectJoinUnion(face_rect, head_rect, AJoin, AUnion);
+//            if (face_scale >= 0.7) {
+//                if (face_tracker_count.find(trackID) == face_tracker_count.end()) { //不存在 key
+//                    if (result_ldmk_boxes_tmp.size() < 8) {
+//                        result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+//
+//                        std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
+//                        result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
+//
+//                        vector<int> face_tracker_count_value = {frameCount, face_rect.width * face_rect.height};
+//                        face_tracker_count[trackID] = face_tracker_count_value;
+//                        //                        cout << "new track id " << trackID << " face ldmk" << endl;
+//                    }
+//                } else {
+//                    //                    fps: 10 , time: 1s,  与上一次face box 面积比大于 1.2
+//                    if (frameCount - face_tracker_count[trackID][0] > (fps / frames_skip) * interval ||
+//                        face_rect.width * face_rect.height / face_tracker_count[trackID][1] > area_scale) {
+//                        if (result_ldmk_boxes_tmp.size() < 8) {
+//                            result_ldmk_boxes_tmp.emplace_back(ldmk_boxes_tmp[i]);
+//
+//                            std::vector<int> tmp_result = {ldmk_boxes_tmp[i][0], ldmk_boxes_tmp[i][1], ldmk_boxes_tmp[i][2], ldmk_boxes_tmp[i][3], trackID, head_index};
+//                            result_ldmk_boxes_with_trackID_index.emplace_back(tmp_result);
+//
+//                            vector<int> face_tracker_count_value = {frameCount, face_rect.width * face_rect.height};
+//                            face_tracker_count[trackID] = face_tracker_count_value;
+//                            //                            cout << "update track id " << trackID << " face ldmk" << endl;
+//                        }
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//    }
     result.emplace_back(result_ldmk_boxes_tmp);
     result.emplace_back(result_ldmk_boxes_with_trackID_index);
 
