@@ -123,6 +123,7 @@ Dispatch::Dispatch(){
 
             mCamPath[i]       = stream_path;
             mDsHandlers[i]    = new dsHandler(stream_path, 1280, 720, 4000000, i, path_h264, frames_skip);
+//            mDsHandlers[i]    = new dsHandler(stream_path, 1920, 1080, 4000000, i, path_h264, frames_skip);
             mCon_not_empty[i] = &mDsHandlers[i]->mCon_not_empty;
             mCon_not_full[i]  = &mDsHandlers[i]->mCon_not_full;
             mConMutexCam[i]   = &mDsHandlers[i]->myMutex;
@@ -399,6 +400,7 @@ void Dispatch::ConsumeRTMPImage(int mode){
     int  fps   = conf["CAM"][mode]["FPS"].as<int>();
     int  out_w = conf["CAM"][mode]["CAMERA_TYPE"]["RTMP_SIZE"]["WIDTH"].as<int>();
     int  out_h = conf["CAM"][mode]["CAMERA_TYPE"]["RTMP_SIZE"]["HEIGHT"].as<int>();
+    int  frames_skip_rtmp = conf["CAM"][mode]["FRAMES_SKIP"].as<int>();
 
     mutex              *lock;
     queue <cv::Mat>    *queue;
@@ -436,7 +438,17 @@ void Dispatch::ConsumeRTMPImage(int mode){
         cv::resize(img, img, cv::Size(out_w, out_h));
 
         writer.write(img);
-        writer.write(img);
+//        writer.write(img);
+
+//        if (rtmp_insert_mode == 1) {
+        for (int i = 0; i < frames_skip_rtmp - 1; ++i) {
+            writer.write(img);
+            //                writer_2p.write(img_2p);
+            //                writer_center.write(img_center);
+        }
+//        }
+
+
         rtmpLock->unlock();
         num++;
         if (num == 10000) num = 0;
@@ -563,10 +575,10 @@ void Dispatch::run(){
     for (int i = 0; i < mCamLive.size(); ++i) {
         if (mCamLive[i]) {
             cout << "start woker thread " << endl;
-            threadArr.emplace_back(&Dispatch::ConsumeImage, this, i);
             threadArr.emplace_back(&Dispatch::ConsumeRTMPImage, this, i);
-
-            this_thread::sleep_for(chrono::seconds(10));
+            threadArr.emplace_back(&Dispatch::ConsumeImage, this, i);
+//            this_thread::sleep_for(chrono::seconds(10));
+            this_thread::sleep_for(chrono::seconds(5));
             threadArr.emplace_back(&Dispatch::ProduceImage, this, i);
         }
     }

@@ -19,7 +19,7 @@ dsHandler::dsHandler(){
 dsHandler::dsHandler(string vRTSPCAM, int vMUXER_OUTPUT_WIDTH, int vMUXER_OUTPUT_HEIGHT, int vMUXER_BATCH_TIMEOUT_USEC,
                      int camNum, int mode, int vFrame_skip) :
         RTSPCAM(vRTSPCAM), MUXER_OUTPUT_WIDTH(vMUXER_OUTPUT_WIDTH), MUXER_OUTPUT_HEIGHT(vMUXER_OUTPUT_HEIGHT),
-        MUXER_BATCH_TIMEOUT_USEC(vMUXER_BATCH_TIMEOUT_USEC), frame_skip(vFrame_skip){
+        MUXER_BATCH_TIMEOUT_USEC(vMUXER_BATCH_TIMEOUT_USEC), pic_num(camNum),frame_skip(vFrame_skip){
 
     //    mode 0 h264, mode 1 h265
     string camPath = "";
@@ -64,7 +64,12 @@ void dsHandler::run(){
     state = 1;
     cv::Mat frame;
 
+    cout << "stsrt produce " << pic_num << " camera" << endl;
+
+
     cam.open(RTSPCAM);
+
+    cout << pic_num << endl;
 
     if (!cam.isOpened()) {
         cout << "cam open failed!" << endl;
@@ -85,8 +90,10 @@ void dsHandler::run(){
                 std::cout << "Produce  is waiting for items...\n";
                 mCon_not_full.wait(guard);
             }
+            if (pic_num==0){
+                cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
+            }
 
-            //            cout << "rtsp " << num << " cost -- " << getCurrentTime_ds() - start << endl;
             imgQueue.push(frame);
             mCon_not_empty.notify_all();
             guard.unlock();
